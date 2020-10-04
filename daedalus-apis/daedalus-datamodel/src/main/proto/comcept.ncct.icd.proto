@@ -1,0 +1,3584 @@
+/*
+ * This technical data is controlled under the International Traffic in Arms Regulation (ITAR) and may not be exposed to a foreign person, either in the U.S., or abroad, without proper authorization by the U.S. Department of State.
+ *
+ * RESTRICTED RIGHTS
+ * Contract No.: UAS and Net-Centric Resource Management Teaming IR&D
+ * Contractor Name: L3HARRIS, COMCEPT DIVISION
+ * Contractor Address: 1700 Science Place, Rockwall, TX 75032
+ * The Government's rights to use, modify, reproduce, release, perform, display, or disclose this software are restricted by paragraph (b)(3) of the Rights in Noncommercial Computer Software and Noncommercial Computer Software Documentation clause contained in the above identified contract.  Any reproduction of computer software or portions thereof marked with this legend must also reproduce the markings.  Any person, other than the Government, who has been provided access to such software, must promptly notify the above named Contractor.
+ *
+ * COPYRIGHT 2018, 2020 L3 TECHNOLOGIES INC., COMCEPT DIVISION, A SUBSIDIARY OF L3HARRIS TECHNOLOGIES, INC. (L3HARRIS).  ALL RIGHTS RESERVED.
+ */
+syntax = "proto3";
+import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/descriptor.proto";
+package comcept.ncct.msglib;
+option csharp_namespace = "ComCept.Ncct.Msglib";
+option java_package = "comcept.ncct.msglib";
+option java_multiple_files = true;
+// Ncct Proto Version: 5.0.1.r9
+
+enum IcdMsglibVersion {
+	option allow_alias = true;
+	RESERVED = 0;
+	CURRENT_MAJOR = 5;
+	CURRENT_MINOR = 0;
+	CURRENT_PATCH = 1;
+	CURRENT_BUILD = 9;
+}
+
+extend google.protobuf.FieldOptions {
+	FieldValidator validator = 65020;
+	FieldInfo info = 65021;
+}
+
+message FieldValidator {
+	string regex = 1;
+	int64 min = 2;
+	int64 max = 3;
+	bool isMandatory = 4;
+}
+
+message FieldInfo {
+	bool dws = 1;
+	bool url = 2;
+	bool geo = 3;
+	bool elnot = 4;
+	bool image = 5;
+	bool imageData = 6;
+}
+
+
+message LoggerMsg {
+	google.protobuf.StringValue source = 1 [(validator) = {isMandatory: true }, (info) = {dws: true }];
+	google.protobuf.StringValue catalog = 2 [(validator) = {isMandatory: true }, (info) = {dws: true }];
+	google.protobuf.StringValue message_name = 3 [(validator) = {isMandatory: true }, (info) = {dws: true }];
+	google.protobuf.Timestamp log_timestamp = 4 [(validator) = {isMandatory: true }];
+	google.protobuf.BytesValue message_binary = 5 [(validator) = {isMandatory: true }];
+}
+
+
+message SegmentRequestMsg {
+	repeated SegmentRequestInfo segment_request_info = 1;
+}
+
+
+message SegmentRequestInfo {
+	MessageInfo message_info = 1 [(validator) = {isMandatory: true }];
+	google.protobuf.Int32Value segment_number = 2 [(validator) = {min: 1, max: 2147483647, isMandatory: true }];
+	NcctId requested_message_id = 3 [(validator) = {isMandatory: true }];
+}
+
+
+message MessageInfo {
+	CatalogTypeValue catalog = 1 [(validator) = {isMandatory: true }];
+	google.protobuf.Int32Value message_type = 2 [(validator) = {min: 0, max: 2147483647 }];
+	fixed64 message_subtype = 3;
+}
+
+
+message NcctId {
+	google.protobuf.Int32Value nnc_id = 1 [(validator) = {min: 1, max: 2147483647, isMandatory: true }];
+	google.protobuf.Int32Value sub_id = 2 [(validator) = {min: 0, max: 2147483647, isMandatory: true }];
+	Uuid unique_id = 3;
+	google.protobuf.Int32Value counter = 4;
+}
+
+
+message SubscriptionFilterMsg {
+	SubscriptionFilterDetails filter_details = 2;
+}
+
+
+message SubscriptionFilterDetails {
+	repeated MessageInfo message_type = 1;
+	google.protobuf.Int32Value geo_mask = 2;
+	google.protobuf.Int32Value filter_nnc_id = 3 [(validator) = {min: 1, max: 2147483647 }];
+	google.protobuf.Int32Value filter_sub_id = 4 [(validator) = {min: 0, max: 2147483647 }];
+}
+
+
+message FusionConfDetails {
+	NcctId fusion_component_id = 1 [(validator) = {isMandatory: true }];
+	repeated FusionProductType fusion_product_type = 2;
+	repeated IntelligenceType consumes_types = 3;
+	SensorStatusTypeValue sensor_status = 4 [(validator) = {isMandatory: true }];
+	repeated FusionDataFormat fusion_format = 5;
+}
+
+
+message NncEnvelopeMsg {
+	Security security_markings = 1 [(validator) = {isMandatory: true }];
+	NcctId message_id = 2 [(validator) = {isMandatory: true }];
+	Uuid message_instance_id = 3 [(validator) = {isMandatory: true }];
+	SegmentInfo segment_info = 4;
+	VersionNumber icd_version = 5 [(validator) = {isMandatory: true }];
+	CompressionTypeValue compression_type = 6 [(validator) = {isMandatory: true }];
+	MessageInfo message_info = 7 [(validator) = {isMandatory: true }];
+	google.protobuf.Int32Value hop_count = 8 [(validator) = {min: 0, max: 1023, isMandatory: true }];
+	google.protobuf.Int32Value priority = 9 [(validator) = {min: 1, max: 20, isMandatory: true }];
+	google.protobuf.UInt32Value payload_crc = 10 [(validator) = {isMandatory: true }];
+	google.protobuf.Timestamp network_expiration_time = 11 [(validator) = {isMandatory: true }];
+	NncBitMask nnc_multicast_bitmask = 12 [(validator) = {isMandatory: true }];
+	google.protobuf.BoolValue database_sync = 13 [(validator) = {isMandatory: true }];
+	google.protobuf.BytesValue payload = 14 [(validator) = {isMandatory: true }];
+}
+
+
+message Security {
+	SecurityClassificationValue classification = 1 [(validator) = {isMandatory: true }];
+	SecurityCompartmentValue compartment = 2 [(validator) = {isMandatory: true }];
+	SecurityReleasabilityValue releasability = 3 [(validator) = {isMandatory: true }];
+}
+
+
+message Uuid {
+	google.protobuf.StringValue hex_string = 1 [(validator) = {isMandatory: true }, (info) = {dws: true }];
+}
+
+
+message SegmentInfo {
+	SegmentTypeValue segment_type = 1 [(validator) = {isMandatory: true }];
+	google.protobuf.Int32Value segmentor_id = 2 [(validator) = {min: 1, max: 2147483647, isMandatory: true }];
+	google.protobuf.Int32Value segment_number = 3 [(validator) = {min: 1, max: 2147483647, isMandatory: true }];
+	google.protobuf.Int32Value number_of_segments = 4 [(validator) = {min: 1, max: 2147483647, isMandatory: true }];
+}
+
+
+message VersionNumber {
+	google.protobuf.Int32Value major_version = 1 [(validator) = {isMandatory: true }];
+	google.protobuf.Int32Value minor_version = 2 [(validator) = {isMandatory: true }];
+	google.protobuf.Int32Value patch_version = 3;
+	google.protobuf.StringValue build_number = 4 [(validator) = {isMandatory: true }, (info) = {dws: true }];
+}
+
+
+message NncBitMask {
+	repeated google.protobuf.UInt32Value addressed_nodes = 1;
+	repeated google.protobuf.UInt32Value traversed_nodes = 2;
+	google.protobuf.BoolValue broadcast = 3 [(validator) = {isMandatory: true }];
+}
+
+
+message BlockBase {
+	Security security_markings = 1 [(validator) = {isMandatory: true }];
+	repeated KeyValuePair kvps = 2;
+}
+
+
+message KeyValuePair {
+	google.protobuf.StringValue key = 1 [(info) = {dws: true }];
+	google.protobuf.StringValue value = 2 [(info) = {dws: true }];
+}
+
+
+message Provenance {
+	BlockBase base = 1 [(validator) = {isMandatory: true }];
+	ProvenanceSourceTypeValue source_type = 2;
+	google.protobuf.StringValue source_sub_type = 3 [(info) = {dws: true }];
+	google.protobuf.StringValue source_name = 4 [(info) = {dws: true }];
+	NativeIdTypeValue native_id_type = 6;
+	google.protobuf.StringValue native_id = 7 [(info) = {dws: true }];
+}
+
+
+message SyncTuneSessionInfo {
+	BlockBase base = 1 [(validator) = {isMandatory: true }];
+	google.protobuf.StringValue session_id = 2 [(info) = {dws: true }];
+	google.protobuf.Int32Value session_id_counter = 3 [(validator) = {min: 0, max: 9999 }];
+	google.protobuf.Int32Value tail_number = 4;
+}
+
+
+message TaskDetails {
+	ElintDetails elint_details = 1;
+	ComintDetails comint_details = 2;
+	MtiDetails mti_details = 3;
+	SyncTuneSessionInfo sync_tune_session_info = 4;
+	ImageDetails image_details = 5 [(info) = {image: true }];
+	GeoObject location = 6;
+	google.protobuf.Timestamp time_first_observed = 7;
+	GeoObject first_observed_location = 8;
+	KinematicDetails kinematics = 9;
+	IdentificationDetails identification = 10;
+	AisDetails ais_details = 11;
+	ComintAdvancedDetails comint_advanced_details = 12;
+}
+
+
+message ElintDetails {
+	BlockBase base = 1 [(validator) = {isMandatory: true }];
+	SigintBase sigint_base = 2;
+	google.protobuf.DoubleValue scan_period = 3 [(validator) = {min: 0, max: 60 }];
+	ScanTypeValue scan_type = 4;
+	InterPulseModulationTypeValue modulation_type = 5;
+	google.protobuf.Int32Value stagger_legs = 6;
+	google.protobuf.DoubleValue illumination_rate = 7 [(validator) = {min: 1, max: 655 }];
+	DecoyValue decoy_type = 8;
+}
+
+
+message ComintDetails {
+	BlockBase base = 1 [(validator) = {isMandatory: true }];
+	SigintBase sigint_base = 2;
+	google.protobuf.DoubleValue chip_hop_rate = 3;
+	google.protobuf.DoubleValue hop_dwell = 4 [(validator) = {min: 1, max: 268435455 }];
+	ComintModulationTypeValue modulation_type = 5;
+	google.protobuf.StringValue op_id = 6 [(info) = {dws: true }];
+	google.protobuf.Int32Value baud_rate = 7;
+}
+
+
+message MtiDetails {
+	BlockBase base = 1 [(validator) = {isMandatory: true }];
+	google.protobuf.DoubleValue width = 2 [(validator) = {min: 1, max: 253 }];
+	google.protobuf.DoubleValue length = 3 [(validator) = {min: 1, max: 10000 }];
+	google.protobuf.FloatValue scan_period = 4 [(validator) = {min: 0, max: 60 }];
+	google.protobuf.Int32Value number_of_tracks = 5 [(validator) = {min: 1, max: 299 }];
+	google.protobuf.FloatValue percent_tracked = 6 [(validator) = {min: 0, max: 100 }];
+	google.protobuf.FloatValue percent_other = 7 [(validator) = {min: 0, max: 100 }];
+	TravelModeValue travel_mode = 8;
+	SpecialInterestIndicatorValue special_interest_indicator = 10;
+	google.protobuf.DoubleValue radar_cross_section = 11 [(validator) = {min: 1, max: 1000 }];
+}
+
+
+message ImageDetails {
+	BlockBase base = 1 [(validator) = {isMandatory: true }];
+	NcctId image_id = 2;
+	GeoPolygon bounding_points = 3;
+	google.protobuf.StringValue image_url = 4 [(info) = {dws: true, url: true, imageData: true }];
+	ImageSourceValue image_source = 5;
+	ImageSystemValue image_system = 6;
+	ImageryFormatValue image_format = 7;
+	ImageResolutionValue image_resolution = 8;
+	ImageCapabilityValue source_capability_type = 9;
+	ImageryAnalysisTypeValue analysis_type = 10;
+	ImagePlaneValue image_plane = 11;
+	google.protobuf.Int32Value niirs = 12;
+	google.protobuf.Int32Value dpi = 13;
+	google.protobuf.Int32Value image_size_bytes = 14;
+}
+
+
+message GeoObject {
+	BlockBase base = 1 [(validator) = {isMandatory: true }];
+	GeoTypeValue geometry_type = 2;
+	oneof geo {
+		GeoPoint point = 3 [(info) = {geo: true }];
+		GeoPolygon polygon = 4;
+		GeoBoundingBox bounding_box = 5;
+		GeoCircle circle = 6;
+		GeoSector sector = 8;
+		GeoLineOfBearing line_of_bearing = 9;
+		GeoLineOfBearingFix line_of_bearing_fix = 10;
+		GeoConeAngle cone_angle = 11;
+		GeoConeAngleFix cone_angle_fix = 12;
+	}
+	EllipticalArea error_ellipse = 13;
+	CovarianceMatrix cartesian_covariance = 14;
+}
+
+
+message KinematicDetails {
+	BlockBase base = 1 [(validator) = {isMandatory: true }];
+	google.protobuf.DoubleValue course = 2 [(validator) = {min: 0, max: 360 }];
+	google.protobuf.DoubleValue speed = 3 [(validator) = {min: 0, max: 8000 }];
+	TrackStateValue track_state = 4;
+	google.protobuf.DoubleValue acceleration = 5 [(validator) = {min: 0, max: 350 }];
+	CartesianVelocity cartesian_velocity = 6;
+	CartesianLagError cartesian_lag_error = 7;
+}
+
+
+message IdentificationDetails {
+	BlockBase base = 1 [(validator) = {isMandatory: true }];
+	repeated SIDC sidcs = 2;
+	google.protobuf.FloatValue ident_confidence = 3;
+	google.protobuf.StringValue full_tail_number = 4 [(info) = {dws: true }];
+	google.protobuf.StringValue platform_digraph = 5 [(info) = {dws: true }];
+	google.protobuf.StringValue call_sign = 6 [(info) = {dws: true }];
+	EnvironmentValue environment = 7;
+	IdentityValue identity = 8;
+	TargetClassValue target_class = 9;
+	google.protobuf.Int32Value number_of_tracks = 10;
+	google.protobuf.Int32Value nationality = 11;
+	oneof platform {
+		google.protobuf.Int32Value air_platform = 12;
+		google.protobuf.Int32Value surface_platform = 13;
+		google.protobuf.Int32Value subsurface_platform = 14;
+		google.protobuf.Int32Value land_platform = 15;
+		google.protobuf.Int32Value space_platform = 16;
+	}
+	oneof platform_amplification {
+		google.protobuf.Int32Value space_amplification = 17;
+	}
+	google.protobuf.FloatValue space_platform_amplification_confidence = 18;
+	oneof activity {
+		google.protobuf.Int32Value air_activity = 19;
+		google.protobuf.Int32Value surface_activity = 20;
+		google.protobuf.Int32Value subsurface_activity = 21;
+		google.protobuf.Int32Value land_activity = 22;
+		google.protobuf.Int32Value space_activity = 23;
+	}
+	repeated SpecificType specific_types = 24;
+}
+
+
+message AisDetails {
+	BlockBase base = 1 [(validator) = {isMandatory: true }];
+	google.protobuf.Int32Value mmsi = 2;
+	google.protobuf.Int32Value imo_number = 3;
+	AisStationTypeValue station_type = 4;
+	AisShipTypeValue ship_type = 5;
+	AisAidTypeValue aid_type = 6;
+	AisOffPositionIndicatorValue off_position_indicator = 7;
+	AisEpfdTypeValue epfd_type = 8;
+	AisPositionUncertaintyIndicatorValue pos_uncertainty = 9;
+	AisNavigationStatusValue nav_status = 11;
+	google.protobuf.DoubleValue epfd_distance_aft_bow = 12 [(validator) = {min: 0, max: 511 }];
+	google.protobuf.DoubleValue epfd_distance_stern = 13 [(validator) = {min: 0, max: 511 }];
+	google.protobuf.DoubleValue epfd_distance_port = 14 [(validator) = {min: 0, max: 511 }];
+	google.protobuf.DoubleValue epfd_distance_starboard = 15 [(validator) = {min: 0, max: 511 }];
+	google.protobuf.StringValue name = 16 [(info) = {dws: true }];
+	google.protobuf.StringValue call_sign = 17 [(info) = {dws: true }];
+	google.protobuf.StringValue destination = 18 [(info) = {dws: true }];
+	google.protobuf.Timestamp destination_eta = 19;
+	google.protobuf.Int32Value mothership_mmsi = 20 [(validator) = {min: 0, max: 999999999 }];
+}
+
+
+message ComintAdvancedDetails {
+	BlockBase base = 1 [(validator) = {isMandatory: true }];
+	google.protobuf.StringValue tech_type = 2 [(validator) = {isMandatory: true }, (info) = {dws: true }];
+	google.protobuf.StringValue selector = 3 [(info) = {dws: true }];
+	repeated KeyValuePair advanced_metadata = 4;
+}
+
+
+message EllipticalArea {
+	google.protobuf.DoubleValue semi_major = 1 [(validator) = {min: 0, max: 6371000 }];
+	google.protobuf.DoubleValue semi_minor = 2 [(validator) = {min: 0, max: 6371000 }];
+	google.protobuf.DoubleValue orientation = 3 [(validator) = {min: 0, max: 360 }];
+}
+
+
+message Attitude {
+	google.protobuf.DoubleValue pitch = 1 [(validator) = {min: -180, max: 180 }];
+	google.protobuf.DoubleValue roll = 2 [(validator) = {min: -180, max: 180 }];
+	google.protobuf.DoubleValue yaw = 3 [(validator) = {min: -180, max: 180 }];
+	google.protobuf.DoubleValue heading = 4 [(validator) = {min: 0, max: 360 }];
+}
+
+
+message SigintBase {
+	google.protobuf.Int32Value function_code = 2;
+	repeated EmitterNotation emitter_notation = 3;
+	RfSignal signal_data = 4;
+	WartimeReserveModeValue war_reserve_mode = 5;
+	google.protobuf.Int32Value sensor_number = 6 [(validator) = {min: 1, max: 200 }];
+	SignalAmpValue signal_amplification = 7;
+}
+
+
+message EmitterNotation {
+	EmitterNotationTypeValue type = 1 [(validator) = {isMandatory: true }];
+	google.protobuf.StringValue value = 2 [(validator) = {isMandatory: true }, (info) = {dws: true, elnot: true }];
+	google.protobuf.FloatValue confidence = 3;
+}
+
+
+message RfSignal {
+	Frequency freq_center = 1;
+	FrequencyRange freq_range = 2;
+	PulseRepetitionInterval pri = 3;
+	google.protobuf.DoubleValue pulse_width = 4 [(validator) = {min: 1, max: 700000 }, (info) = {elnot: true }];
+	google.protobuf.DoubleValue bandwidth = 5 [(validator) = {min: 1, max: 2000000000 }, (info) = {elnot: true }];
+	google.protobuf.DoubleValue signal_noise_ratio = 6 [(validator) = {min: -200, max: 200 }, (info) = {elnot: true }];
+}
+
+
+message AmtiDetails {
+	BlockBase base = 1 [(validator) = {isMandatory: true }];
+	EngagedValue engaged = 2;
+	ReportStatusValue report_status = 3;
+	google.protobuf.UInt32Value cepn = 4 [(validator) = {min: 0, max: 4294967295 }];
+	google.protobuf.Int32Value cepx_extend = 5 [(validator) = {min: 0, max: 1 }];
+	google.protobuf.Int32Value cepx = 6 [(validator) = {min: 0, max: 65535 }];
+	google.protobuf.Int32Value correlated_cepx_extend = 7 [(validator) = {min: 0, max: 1 }];
+	google.protobuf.Int32Value correlated_cepx = 8 [(validator) = {min: 0, max: 65535 }];
+	google.protobuf.DoubleValue radar_cross_section = 9 [(validator) = {min: 0, max: 65535 }];
+}
+
+
+message SIDC {
+	google.protobuf.StringValue sidc_string = 1 [(info) = {dws: true }];
+	google.protobuf.FloatValue confidence = 2;
+}
+
+
+message SpecificType {
+	oneof specific_type {
+		google.protobuf.Int32Value air = 1;
+		google.protobuf.Int32Value surface = 2;
+		google.protobuf.Int32Value subsurface = 3;
+		google.protobuf.Int32Value land = 4;
+		google.protobuf.Int32Value space = 5;
+	}
+	google.protobuf.FloatValue confidence = 6;
+}
+
+
+message CartesianVelocity {
+	CartesianCoordinateReferenceValue coordinate_reference = 1;
+	google.protobuf.DoubleValue x_velocity = 2 [(validator) = {min: -15000000, max: 15000000 }];
+	google.protobuf.DoubleValue y_velocity = 3 [(validator) = {min: -15000000, max: 15000000 }];
+	google.protobuf.DoubleValue z_velocity = 4 [(validator) = {min: -15000000, max: 15000000 }];
+}
+
+
+message CartesianLagError {
+	CartesianCoordinateReferenceValue coordinate_reference = 1;
+	google.protobuf.DoubleValue lag_x_position = 2 [(validator) = {min: -262144, max: 262144 }];
+	google.protobuf.DoubleValue lag_y_position = 3 [(validator) = {min: -262144, max: 262144 }];
+	google.protobuf.DoubleValue lag_z_position = 4 [(validator) = {min: -262144, max: 262144 }];
+	google.protobuf.DoubleValue lag_x_velocity = 5 [(validator) = {min: -8000, max: 8000 }];
+	google.protobuf.DoubleValue lag_y_velocity = 6 [(validator) = {min: -8000, max: 8000 }];
+	google.protobuf.DoubleValue lag_z_velocity = 7 [(validator) = {min: -8000, max: 8000 }];
+}
+
+
+message ImintDetails {
+	BlockBase base = 1 [(validator) = {isMandatory: true }];
+	IdSourceValue id_source = 2;
+	LocationSourceValue location_source = 3;
+	CollateralAmpInformationValue collateral_amp_info = 4;
+	InterpretabilityCodeValue interpretability_code = 5;
+	ChangeDetectionValue change_detection = 6;
+	google.protobuf.StringValue status_or_activity = 7 [(info) = {dws: true }];
+	google.protobuf.DoubleValue proximity = 8 [(validator) = {min: 1, max: 1500 }];
+	google.protobuf.StringValue be_number = 9 [(info) = {dws: true }];
+}
+
+
+message PlatformConfigurationMsg {
+	PlatformConfDetails details = 2 [(validator) = {isMandatory: true }];
+	FusionConfDetails fusion_conf_details = 3;
+	repeated InterfaceStatusDetails interface_status_details = 5;
+	google.protobuf.StringValue platform_description = 6 [(info) = {dws: true }];
+}
+
+
+message PlatformConfDetails {
+	google.protobuf.Int32Value sub_id_min = 1 [(validator) = {min: 0, max: 2147483647, isMandatory: true }];
+	google.protobuf.Int32Value sub_id_max = 2 [(validator) = {min: 0, max: 2147483647, isMandatory: true }];
+	repeated SensorDetails sensors = 4;
+	repeated ComintAdvancedCapability comint_advanced_capabilities = 5;
+}
+
+
+message InterfaceStatusDetails {
+	CapabilityTypeValue interface_type = 1 [(validator) = {isMandatory: true }];
+	ConnectionStatusValue status = 2 [(validator) = {isMandatory: true }];
+	repeated TaskingCapability tasking_capability = 3;
+}
+
+
+message SensorDetails {
+	google.protobuf.Int32Value sensor_id = 1 [(validator) = {isMandatory: true }];
+	google.protobuf.StringValue sensor_name = 2 [(info) = {dws: true }];
+	SensorTypeValue sensor_type = 3 [(validator) = {isMandatory: true }];
+	SensorStatusTypeValue sensor_status = 4 [(validator) = {isMandatory: true }];
+	repeated Fov fovs = 5;
+	FrequencyRange frequency_range = 6;
+	BandwidthRange bandwidth_range = 7;
+	AudioFormatValue audio_format = 8;
+	repeated TaskingCapability tasking_capability = 9;
+}
+
+
+message ComintAdvancedCapability {
+	BlockBase base = 1 [(validator) = {isMandatory: true }];
+	google.protobuf.StringValue tech_type = 2 [(validator) = {isMandatory: true }, (info) = {dws: true }];
+	google.protobuf.StringValue description = 3 [(info) = {dws: true }];
+}
+
+
+message TaskingCapability {
+	TaskTypesValue task_type = 1 [(validator) = {isMandatory: true }];
+	google.protobuf.Int32Value taskable_sub_id = 2 [(validator) = {min: 0, max: 2147483647, isMandatory: true }];
+	google.protobuf.Int32Value task_depth = 3 [(validator) = {min: 0, max: 2147483647, isMandatory: true }];
+	google.protobuf.FloatValue task_duration = 4 [(validator) = {min: 1, max: 86400, isMandatory: true }];
+}
+
+
+message GeoPoint {
+	google.protobuf.DoubleValue latitude = 1 [(validator) = {min: -90, max: 90 }];
+	google.protobuf.DoubleValue longitude = 2 [(validator) = {min: -180, max: 180 }];
+	google.protobuf.DoubleValue altitude_msl = 3 [(validator) = {min: -10000, max: 40000000 }];
+	google.protobuf.DoubleValue altitude_agl = 4 [(validator) = {min: 0, max: 40000000 }];
+}
+
+
+message GeoPolygon {
+	repeated GeoPoint bounding_points = 1 [(info) = {geo: true }];
+}
+
+
+message GeoBoundingBox {
+	GeoPoint upper_left = 1 [(info) = {geo: true }];
+	GeoPoint upper_right = 2 [(info) = {geo: true }];
+	GeoPoint lower_right = 3 [(info) = {geo: true }];
+	GeoPoint lower_left = 4 [(info) = {geo: true }];
+}
+
+
+message GeoCircle {
+	GeoPoint center = 1 [(info) = {geo: true }];
+	google.protobuf.DoubleValue radius = 2 [(validator) = {min: 0, max: 6371000 }];
+}
+
+
+message GeoSector {
+	GeoPoint center = 1 [(info) = {geo: true }];
+	google.protobuf.DoubleValue inner_radius = 2 [(validator) = {min: 0, max: 6371000 }];
+	google.protobuf.DoubleValue outer_radius = 7 [(validator) = {min: 0, max: 6371000 }];
+	google.protobuf.DoubleValue center_degrees = 3 [(validator) = {min: -180, max: 180 }];
+	google.protobuf.DoubleValue azimuth_width = 4 [(validator) = {min: 0, max: 360 }];
+	google.protobuf.DoubleValue elevation_min_degrees = 5 [(validator) = {min: -90, max: 90 }];
+	google.protobuf.DoubleValue elevation_max_degrees = 6 [(validator) = {min: -90, max: 90 }];
+}
+
+
+message GeoLineOfBearing {
+	GeoPoint origin = 1 [(info) = {geo: true }];
+	GeoRangeBearing range_bearing = 2;
+	google.protobuf.DoubleValue origin_heading = 3 [(validator) = {min: 0, max: 360 }];
+}
+
+
+message GeoLineOfBearingFix {
+	GeoLineOfBearing lob = 1;
+	GeoPoint fix = 2;
+}
+
+
+message GeoConeAngle {
+	GeoPoint origin = 1 [(info) = {geo: true }];
+	GeoRangeBearing range_bearing = 2;
+	google.protobuf.DoubleValue origin_heading = 3 [(validator) = {min: 0, max: 360 }];
+	google.protobuf.DoubleValue origin_pitch = 4 [(validator) = {min: -180, max: 180 }];
+	google.protobuf.DoubleValue origin_roll = 5 [(validator) = {min: -180, max: 180 }];
+	google.protobuf.DoubleValue sensor_roll = 6 [(validator) = {min: -180, max: 180 }];
+	google.protobuf.DoubleValue sensor_pitch = 7 [(validator) = {min: -180, max: 180 }];
+	google.protobuf.DoubleValue sensor_yaw = 8 [(validator) = {min: -180, max: 180 }];
+	google.protobuf.DoubleValue bore_sigma_degree = 9 [(validator) = {min: 0, max: 180 }];
+}
+
+
+message GeoConeAngleFix {
+	GeoConeAngle cone_angle = 1;
+	GeoPoint fix = 2;
+}
+
+
+message CovarianceMatrix {
+	google.protobuf.DoubleValue x_x = 1 [(validator) = {min: 0, max: 10000000000 }];
+	google.protobuf.DoubleValue x_y = 2 [(validator) = {min: -10000000000, max: 10000000000 }];
+	google.protobuf.DoubleValue x_z = 3 [(validator) = {min: -10000000000, max: 10000000000 }];
+	google.protobuf.DoubleValue y_y = 4 [(validator) = {min: 0, max: 10000000000 }];
+	google.protobuf.DoubleValue y_z = 5 [(validator) = {min: -10000000000, max: 10000000000 }];
+	google.protobuf.DoubleValue z_z = 6 [(validator) = {min: 0, max: 10000000000 }];
+	google.protobuf.DoubleValue xdot_xdot = 7 [(validator) = {min: 0, max: 50000000 }];
+	google.protobuf.DoubleValue xdot_ydot = 8 [(validator) = {min: -10000000000, max: 10000000000 }];
+	google.protobuf.DoubleValue xdot_zdot = 9 [(validator) = {min: -10000000000, max: 10000000000 }];
+	google.protobuf.DoubleValue ydot_ydot = 10 [(validator) = {min: 0, max: 50000000 }];
+	google.protobuf.DoubleValue ydot_zdot = 11 [(validator) = {min: -10000000000, max: 10000000000 }];
+	google.protobuf.DoubleValue zdot_zdot = 12 [(validator) = {min: 0, max: 50000000 }];
+	google.protobuf.DoubleValue x_xdot = 13 [(validator) = {min: -10000000000, max: 10000000000 }];
+	google.protobuf.DoubleValue x_ydot = 14 [(validator) = {min: -10000000000, max: 10000000000 }];
+	google.protobuf.DoubleValue x_zdot = 15 [(validator) = {min: -10000000000, max: 10000000000 }];
+	google.protobuf.DoubleValue y_ydot = 16 [(validator) = {min: -10000000000, max: 10000000000 }];
+	google.protobuf.DoubleValue y_zdot = 17 [(validator) = {min: -10000000000, max: 10000000000 }];
+	google.protobuf.DoubleValue z_zdot = 18 [(validator) = {min: -10000000000, max: 10000000000 }];
+	google.protobuf.DoubleValue xdot_y = 19 [(validator) = {min: -10000000000, max: 10000000000 }];
+	google.protobuf.DoubleValue xdot_z = 20 [(validator) = {min: -10000000000, max: 10000000000 }];
+	google.protobuf.DoubleValue ydot_z = 21 [(validator) = {min: -10000000000, max: 10000000000 }];
+}
+
+
+message GeoEllipse {
+	GeoPoint center = 1 [(info) = {geo: true }];
+	EllipticalArea ellipse = 2;
+}
+
+
+message GeoRangeBearing {
+	google.protobuf.DoubleValue range = 1;
+	google.protobuf.DoubleValue range_sigma = 2;
+	google.protobuf.DoubleValue angle = 3 [(validator) = {min: 0, max: 360 }];
+	google.protobuf.DoubleValue angle_sigma = 4 [(validator) = {min: 0, max: 180 }];
+	google.protobuf.DoubleValue depression_degrees = 5 [(validator) = {min: -90, max: 90 }];
+	google.protobuf.DoubleValue depression_sigma = 6 [(validator) = {min: 0, max: 180 }];
+}
+
+
+message PlatformPositionMsg {
+	PlatformPositionDetails platform_details = 2 [(validator) = {isMandatory: true }];
+	google.protobuf.Timestamp time_position_valid = 3 [(validator) = {isMandatory: true }];
+	Provenance provenance = 4;
+	google.protobuf.Int32Value sensor_number = 5 [(validator) = {min: 1, max: 200 }];
+	google.protobuf.StringValue platform_description = 6 [(info) = {dws: true }];
+}
+
+
+message PlatformPositionDetails {
+	GeoPoint location = 1 [(validator) = {isMandatory: true }, (info) = {geo: true }];
+	Attitude attitude = 2;
+	KinematicDetails kinematic = 3;
+	IdentificationDetails identification = 4 [(validator) = {isMandatory: true }];
+}
+
+
+message Fov {
+	oneof fov_area {
+		GeoSector self_centered_sector = 1;
+		GeoPolygon fixed_polygon = 2;
+	}
+}
+
+
+message FrequencyRange {
+	Frequency freq_high = 1;
+	Frequency freq_low = 2;
+}
+
+
+message BandwidthRange {
+	google.protobuf.DoubleValue bandwidth_high = 1 [(validator) = {min: 0, max: 50000000 }];
+	google.protobuf.DoubleValue bandwidth_low = 2 [(validator) = {min: 0, max: 50000000 }];
+}
+
+
+message IffDetails {
+	BlockBase base = 1 [(validator) = {isMandatory: true }];
+	repeated IffModeCode mode_codes = 2;
+	IffMode5 mode_5 = 3;
+	IffModeS mode_s = 4;
+}
+
+
+message IffModeCode {
+	IffModeValue mode_type = 1;
+	IffInterrogationStatusValue interrogation_status = 2;
+	google.protobuf.Int32Value mode_value = 3;
+	IffInterrogationResponseValue interrogation_response = 4;
+}
+
+
+message IffMode5 {
+	IffInterrogationStatusValue interrogation_status = 1;
+	google.protobuf.StringValue mode_1_value = 2 [(info) = {dws: true }];
+	IffMode5NationalOriginValue national_origin = 3;
+	google.protobuf.Int32Value platform_id = 4;
+}
+
+
+message IffModeS {
+	google.protobuf.StringValue aircraft_id = 1 [(info) = {dws: true }];
+	google.protobuf.Int32Value aircraft_address = 2;
+}
+
+
+message CartesianSpatial {
+	CartesianCoordinateReferenceValue coordinate_reference = 1;
+	google.protobuf.DoubleValue x_position = 2 [(validator) = {min: -50000000, max: 50000000 }];
+	google.protobuf.DoubleValue y_position = 3 [(validator) = {min: -50000000, max: 50000000 }];
+	google.protobuf.DoubleValue z_position = 4 [(validator) = {min: -50000000, max: 50000000 }];
+}
+
+
+message ImageRequestMsg {
+	NcctId image_id = 2 [(validator) = {isMandatory: true }];
+	GeoPolygon bounding_polygon = 3 [(validator) = {isMandatory: true }];
+	ImageryFormatValue image_format = 4 [(validator) = {isMandatory: true }];
+	google.protobuf.Int32Value dpi = 5 [(validator) = {isMandatory: true }];
+}
+
+
+message ImageDataMsg {
+	NcctId request_id = 2 [(validator) = {isMandatory: true }];
+	google.protobuf.Timestamp time_of_collection = 3;
+	ImageDetails image_details = 4 [(info) = {image: true }];
+	ImageResponseStatusValue response_status = 5 [(validator) = {isMandatory: true }];
+	google.protobuf.BytesValue image_bytes = 6 [(info) = {imageData: true }];
+}
+
+
+message TaskResponseMsg {
+	NcctId task_id = 2 [(validator) = {isMandatory: true }];
+	PlatformActionValue platform_action = 3 [(validator) = {isMandatory: true }];
+	google.protobuf.FloatValue delay = 4;
+	repeated google.protobuf.StringValue tng_nodes = 5 [(info) = {dws: true }];
+}
+
+
+message TimeInfo {
+	TimeFunctionTypeValue time_function = 1;
+	google.protobuf.Timestamp time_value = 2;
+}
+
+
+message SpaceTrackDetails {
+	BlockBase base = 1 [(validator) = {isMandatory: true }];
+	PlatformAmplificationTypeValue space_platform_amplification = 2;
+	AmplificationConfidence1Value space_platform_amplification_confidence = 3;
+	repeated Link16SpaceTrackAmbiguousAmplification ambiguous_amplifications = 4;
+}
+
+
+message Link16SpaceTrackAmbiguousAmplification {
+	PlatformAmplificationTypeValue amplification_type = 1;
+	AmplificationConfidence2Value amplification_confidence = 2;
+}
+
+
+message AssociationMsg {
+	AssociationTypeValue association_type = 2 [(validator) = {isMandatory: true }];
+	CorrelationSourceValue correlation_source = 4 [(validator) = {isMandatory: true }];
+	google.protobuf.StringValue op_id = 6 [(info) = {dws: true }];
+	repeated AssociationPair association_pairs = 7;
+}
+
+
+message AssociationPair {
+	Uuid pair_id = 1 [(validator) = {isMandatory: true }];
+	NcctId source_id = 2 [(validator) = {isMandatory: true }];
+	NcctId target_id = 3 [(validator) = {isMandatory: true }];
+	AssociationReasonValue reason = 4 [(validator) = {isMandatory: true }];
+	AssociationTypeValue type = 7 [(validator) = {isMandatory: true }];
+	google.protobuf.FloatValue confidence = 5 [(validator) = {isMandatory: true }];
+	google.protobuf.Timestamp time_of_creation = 6 [(validator) = {isMandatory: true }];
+}
+
+
+message DataLinkReportStatusMsg {
+	NcctId entity_id = 2 [(validator) = {isMandatory: true }];
+	repeated DataLinkReportStatusValue statuses = 3;
+}
+
+
+message DataLinkReportStatusValue {
+	ReportingLinkValue link = 1;
+	LinkStatusValue status = 2;
+	google.protobuf.StringValue reported_track_id = 3 [(info) = {dws: true }];
+}
+
+
+message DataLinkReportTaskMsg {
+	NcctId reported_element_id = 2 [(validator) = {isMandatory: true }];
+	google.protobuf.Int32Value dest_nnc_id = 3 [(validator) = {min: -1, max: 2147483647, isMandatory: true }];
+	google.protobuf.Int32Value dest_sub_id = 4 [(validator) = {min: -1, max: 2147483647, isMandatory: true }];
+	repeated DataLinkReportActionValue actions = 5;
+	google.protobuf.Timestamp time_of_collection = 6 [(validator) = {isMandatory: true }];
+	EntityDetails entity_details = 7;
+}
+
+
+message DataLinkReportActionValue {
+	ReportingLinkValue link = 1;
+	ReportingActionTypeValue action = 2;
+}
+
+
+message EntityDetails {
+	repeated TimeInfo times = 1;
+	GeoObject location = 2;
+	GeoObject first_observed_location = 3;
+	Attitude attitude = 4;
+	ComintDetails comint = 5;
+	ElintDetails elint = 6;
+	AmtiDetails amti = 7;
+	AisDetails ais = 8;
+	IffDetails iff = 9;
+	IdentificationDetails identification = 10;
+	ImintDetails imint = 11 [(info) = {image: true }];
+	KinematicDetails kinematics = 12;
+	ImageDetails image_details = 13 [(info) = {image: true }];
+	MtiDetails mti_details = 14;
+	CartesianSpatial cartesian_spatial = 15;
+	TrackDetails track_details = 21;
+	SpaceTrackDetails space_track_details = 22;
+	EmergencyPointDetails emergency_point_details = 23;
+	ReferencePointDetails reference_point_details = 24;
+	FighterTargetDetails fighter_target_details = 25;
+	CompositeDetails composite_details = 26;
+	ComintAdvancedDetails comint_advanced_details = 27;
+}
+
+
+message DataAmplificationMsg {
+	NcctId entity_id = 2 [(validator) = {isMandatory: true }];
+	NcctId task_id = 3;
+	google.protobuf.Timestamp time_of_amplification_report = 4;
+	Provenance provenance = 5;
+	IdentificationDetails identification = 7;
+	repeated EmitterNotation emitter_notation = 8;
+	SignalAmpValue signal_amplification = 9;
+	google.protobuf.StringValue text = 11 [(info) = {dws: true }];
+	ComintAdvancedDetails comint_advanced_details = 12;
+}
+
+
+message ChatMsg {
+	IdIdentifierValue referenced_id_type = 2;
+	NcctId referenced_id = 3;
+	Provenance source = 4 [(validator) = {isMandatory: true }];
+	google.protobuf.StringValue text = 5 [(validator) = {isMandatory: true }, (info) = {dws: true }];
+}
+
+
+message TargetDefinitionMsg {
+	google.protobuf.StringValue td_name = 2 [(info) = {dws: true }];
+	google.protobuf.Timestamp time_of_toi_start = 3;
+	google.protobuf.Timestamp time_of_toi_stop = 4;
+	Provenance source = 5 [(validator) = {isMandatory: true }];
+	SentinelFlagValue sentinel_flag = 6;
+	IdentificationDetails identification_filter = 7;
+	google.protobuf.Int32Value priority = 8 [(validator) = {min: 1, max: 7, isMandatory: true }];
+	ArchiveFlagValue archive_flag = 9;
+	google.protobuf.BoolValue active = 10 [(validator) = {isMandatory: true }];
+	repeated EmitterNotation emitter_notations = 11;
+	repeated ComintRfDiscreteParms comint_discretes = 12;
+	repeated BandSearchParms band_searches = 13;
+	repeated NcctId nai_ids = 14;
+	repeated NcctId roi_ids = 15;
+	repeated ElintRfDiscreteParms elint_discretes = 16;
+	repeated AisIdentityParms ais_idents = 17;
+	TngParms tng_parms = 18;
+	repeated ComintAdvancedParams comint_advanced_params = 19;
+}
+
+
+message ComintRfDiscreteParms {
+	RfSignal signal_characteristics = 2 [(validator) = {isMandatory: true }];
+	EmitterNotation emitter_notation = 3;
+	ComintModulationTypeValue modulation_type = 4;
+	google.protobuf.Int32Value baud_rate_min = 5;
+	google.protobuf.Int32Value baud_rate_max = 6;
+}
+
+
+message BandSearchParms {
+	RfSignal signal_characteristics = 2 [(validator) = {isMandatory: true }];
+	google.protobuf.DoubleValue step_size = 3;
+	ComintModulationTypeValue modulation_type = 4;
+	google.protobuf.Int32Value baud_rate_min = 5;
+	google.protobuf.Int32Value baud_rate_max = 6;
+}
+
+
+message ElintRfDiscreteParms {
+	RfSignal signal_characteristics = 2 [(validator) = {isMandatory: true }];
+	EmitterNotation emitter_notation = 3 [(validator) = {isMandatory: true }];
+}
+
+
+message AisIdentityParms {
+	oneof identification {
+		google.protobuf.Int32Value mmsi = 2;
+		google.protobuf.StringValue ais_name = 3 [(info) = {dws: true }];
+		google.protobuf.StringValue ais_callsign = 4 [(info) = {dws: true }];
+	}
+}
+
+
+message TngParms {
+	google.protobuf.BoolValue sustainment = 2;
+	google.protobuf.StringValue preferred_processor = 3 [(info) = {dws: true }];
+	repeated google.protobuf.StringValue preferred_platforms = 4 [(info) = {dws: true }];
+	google.protobuf.BoolValue tngautodf = 5;
+	google.protobuf.BoolValue tngautopsd = 6;
+}
+
+
+message ComintAdvancedParams {
+	BlockBase base = 1 [(validator) = {isMandatory: true }];
+	google.protobuf.StringValue tech_type = 2 [(validator) = {isMandatory: true }, (info) = {dws: true }];
+	oneof comint_param {
+		ComintRfDiscreteParms rf_discretes = 3;
+		BandSearchParms bandwidth_search = 4;
+	}
+	repeated google.protobuf.StringValue selector_filter = 5 [(info) = {dws: true }];
+}
+
+
+message NamedAreaOfInterestMsg {
+	google.protobuf.StringValue nai_name = 2 [(info) = {dws: true }];
+	google.protobuf.BoolValue active = 3 [(validator) = {isMandatory: true }];
+	Provenance provenance = 4 [(validator) = {isMandatory: true }];
+	oneof geo {
+		GeoPolygon polygon = 5;
+		GeoCircle circle = 7;
+	}
+	google.protobuf.BoolValue global = 8;
+}
+
+
+message RelationshipMsg {
+	google.protobuf.Timestamp time_received = 2 [(validator) = {isMandatory: true }];
+	Provenance provenance = 3 [(validator) = {isMandatory: true }];
+	Provenance subject_provenance = 4 [(validator) = {isMandatory: true }];
+	Provenance object_provenance = 5 [(validator) = {isMandatory: true }];
+	NcctId subject_id = 6 [(validator) = {isMandatory: true }];
+	NcctId object_id = 7 [(validator) = {isMandatory: true }];
+	repeated TimeInfo times = 8;
+	RelationshipTypeValue relationship_type = 9;
+	oneof relationship_reason {
+		RelationshipReasonValue value = 10;
+		google.protobuf.StringValue text = 11 [(info) = {dws: true }];
+	}
+}
+
+
+message NcctConnectionMsg {
+	IdRequestTypeValue id_request_type = 2 [(validator) = {isMandatory: true }];
+	ConnectionStatusValue connection_status = 3 [(validator) = {isMandatory: true }];
+	NodeTypeValue node_type = 4 [(validator) = {isMandatory: true }];
+	VersionNumber software_version = 5 [(validator) = {isMandatory: true }];
+	google.protobuf.StringValue software_name = 6 [(info) = {dws: true }];
+	VersionNumber icd_version = 7 [(validator) = {isMandatory: true }];
+	google.protobuf.Int32Value sub_id_min = 8 [(validator) = {min: 0, max: 2147483647 }];
+	google.protobuf.Int32Value sub_id_max = 9 [(validator) = {min: 0, max: 2147483647 }];
+	Security security_environment_markings = 10 [(validator) = {isMandatory: true }];
+	google.protobuf.StringValue description = 11 [(info) = {dws: true }];
+	repeated OperatorFunction operator_functions = 12;
+}
+
+
+message IcdRequestMsg {
+	repeated IcdRequestParms icd_requests = 2;
+}
+
+
+message IcdRequestParms {
+	MessageInfo message_type = 1;
+	NcctId requested_id = 2;
+	google.protobuf.Timestamp time_of_start = 3;
+	google.protobuf.Timestamp time_of_stop = 4;
+}
+
+
+message DeleteMsg {
+	repeated DeleteInfo delete_info = 1;
+}
+
+
+message DeleteInfo {
+	NcctId delete_message_id = 1;
+	MessageInfo message_info = 2;
+}
+
+
+message NetworkStatusMsg {
+	google.protobuf.Int32Value number_of_nncs = 2 [(validator) = {isMandatory: true }];
+}
+
+
+message PingInitiateMsg {
+	google.protobuf.Timestamp time_of_creation = 2 [(validator) = {isMandatory: true }];
+	google.protobuf.BytesValue ping_payload = 3;
+}
+
+
+message PingResponseMsg {
+	google.protobuf.Timestamp time_of_request_creation = 2 [(validator) = {isMandatory: true }];
+	google.protobuf.Timestamp time_of_request_receipt = 3 [(validator) = {isMandatory: true }];
+	google.protobuf.BytesValue ping_payload = 4;
+}
+
+
+message SubscriptionMsg {
+	google.protobuf.Int32Value geo_mask = 1;
+	repeated MessageInfo message_types = 2;
+}
+
+
+message NncConnectionTableMsg {
+	VersionNumber software_version = 2 [(validator) = {isMandatory: true }];
+	VersionNumber icd_version = 3 [(validator) = {isMandatory: true }];
+	Security security_environment_markings = 4 [(validator) = {isMandatory: true }];
+	google.protobuf.BoolValue segmentation_enabled = 5 [(validator) = {isMandatory: true }];
+	google.protobuf.BoolValue compression_enabled = 6 [(validator) = {isMandatory: true }];
+	repeated NncConnectionParms connection_parms = 7;
+}
+
+
+message NncConnectionParms {
+	google.protobuf.Int32Value source_nnc_id = 1 [(validator) = {min: 1, max: 2147483647, isMandatory: true }];
+	google.protobuf.Int32Value destination_nnc_id = 2 [(validator) = {min: 1, max: 2147483647, isMandatory: true }];
+	google.protobuf.Int32Value observed_availability = 3;
+	google.protobuf.Int32Value calculated_capacity = 4;
+	google.protobuf.Int32Value calculated_latency = 5;
+	google.protobuf.Int32Value connection_id = 6 [(validator) = {isMandatory: true }];
+	VersionNumber software_version = 7 [(validator) = {isMandatory: true }];
+	VersionNumber icd_version = 8 [(validator) = {isMandatory: true }];
+	Security security_environment_markings = 9 [(validator) = {isMandatory: true }];
+	google.protobuf.BoolValue segmentation_enabled = 10 [(validator) = {isMandatory: true }];
+	google.protobuf.BoolValue compression_enabled = 11 [(validator) = {isMandatory: true }];
+	google.protobuf.Int32Value connection_bias = 12 [(validator) = {isMandatory: true }];
+}
+
+
+message NominationMsg {
+	NcctId nominated_entity_id = 3 [(validator) = {isMandatory: true }];
+	NcctId interface_node_id = 4 [(validator) = {isMandatory: true }];
+	NominationTypeValue nomination_type = 5 [(validator) = {isMandatory: true }];
+	google.protobuf.StringValue description = 6 [(info) = {dws: true }];
+	google.protobuf.Int32Value dest_nnc_id = 7 [(validator) = {min: -1, max: 2147483647, isMandatory: true }];
+	google.protobuf.Int32Value dest_sub_id = 8 [(validator) = {min: -1, max: 2147483647, isMandatory: true }];
+}
+
+
+message ExtendedInformationMsg {
+	IdIdentifierValue referenced_id_type = 2 [(validator) = {isMandatory: true }];
+	NcctId referenced_id = 3 [(validator) = {isMandatory: true }];
+	oneof task_state_info {
+		TaskRejectionReasonValue task_rejection_reason = 6;
+		ManualAssociationRejectionReasonValue manual_association_rejection_reason = 7;
+		TaskCompletionTypeValue task_completion_type = 8;
+		NodeDesignationErrorDeprecatedValue node_designation_error_deprecated = 9;
+	}
+}
+
+
+message GenericPayloadMsg {
+	google.protobuf.Timestamp time_of_creation = 2 [(validator) = {isMandatory: true }];
+	google.protobuf.BytesValue payload = 3 [(validator) = {isMandatory: true }];
+}
+
+
+message ConnectionInformationMsg {
+	NcctId nnc_id = 2 [(validator) = {isMandatory: true }];
+	Security security_environment_markings = 13 [(validator) = {isMandatory: true }];
+	google.protobuf.Int32Value connection_id = 3;
+	ConnectionStatusValue connection_status = 4 [(validator) = {isMandatory: true }];
+	NodeTypeValue node_type = 5 [(validator) = {isMandatory: true }];
+	VersionNumber software_version = 6 [(validator) = {isMandatory: true }];
+	google.protobuf.StringValue software_name = 7 [(info) = {dws: true }];
+	VersionNumber icd_version = 8 [(validator) = {isMandatory: true }];
+	google.protobuf.Int32Value sub_id_min = 9 [(validator) = {min: 0, max: 2147483647, isMandatory: true }];
+	google.protobuf.Int32Value sub_id_max = 10 [(validator) = {min: 0, max: 2147483647, isMandatory: true }];
+	google.protobuf.StringValue description = 11 [(info) = {dws: true }];
+	repeated OperatorFunction operator_functions = 12;
+}
+
+
+message NncLocalSubscriptionMsg {
+	google.protobuf.Int32Value geo_mask = 1;
+	repeated MessageInfo message_types = 2;
+}
+
+
+message Frequency {
+	google.protobuf.DoubleValue value = 1 [(validator) = {min: 1, max: 300000000000 }, (info) = {elnot: true }];
+	google.protobuf.DoubleValue sigma = 2 [(validator) = {min: 1, max: 2000000000 }, (info) = {elnot: true }];
+}
+
+
+message PulseRepetitionInterval {
+	google.protobuf.DoubleValue value = 1 [(validator) = {min: 1, max: 2000000000 }, (info) = {elnot: true }];
+	google.protobuf.DoubleValue sigma = 2 [(validator) = {min: 1, max: 65533 }, (info) = {elnot: true }];
+}
+
+
+message EntityReportMsg {
+	IntelligenceSourceValue intelligence_source = 2;
+	IntelligenceReportTypeValue intelligence_type = 3;
+	repeated NcctId task_ids = 4;
+	repeated NcctId td_ids = 5;
+	google.protobuf.Timestamp time_of_collection = 6 [(validator) = {isMandatory: true }];
+	google.protobuf.Timestamp time_first_observed = 7;
+	Provenance provenance = 8;
+	EntityDetails entity_details = 11 [(validator) = {isMandatory: true }];
+	SyncTuneSessionInfo sync_tune_session_info = 14;
+	CollectionTypeValue collection_type = 15;
+	CollectionTaskTypeValue collection_task_type = 16;
+	AdjustmentFlagValue adjustment_flag = 17;
+}
+
+
+message TrackDetails {
+	BlockBase base = 1 [(validator) = {isMandatory: true }];
+	google.protobuf.Int32Value track_quality = 3 [(validator) = {min: 0, max: 15 }];
+	AltitudeSourceValue altitude_source = 4;
+}
+
+
+message EmergencyPointDetails {
+	BlockBase base = 1 [(validator) = {isMandatory: true }];
+	EmergencyTypeValue emergency_type = 2;
+	PersonnelInvolvedValue personnel_involved = 3;
+}
+
+
+message ReferencePointDetails {
+	BlockBase base = 1 [(validator) = {isMandatory: true }];
+	ReferencePointAreaTypeValue reference_point_type = 2;
+	NcctId related_space_track_id = 3;
+	PlatformAmplificationTypeValue related_space_track_amplification = 4;
+	AmplificationConfidence1Value related_space_track_amplification_confidence = 5;
+}
+
+
+message FighterTargetDetails {
+	BlockBase base = 1 [(validator) = {isMandatory: true }];
+	EmitterStatusTypeValue emitter_status_type = 2;
+	TargetJammerTypeValue target_jammer_type = 3;
+	google.protobuf.Int32Value probability_of_own_forces = 4 [(validator) = {min: 0, max: 100 }];
+	google.protobuf.Int32Value probability_entity_belongs_to_enemy = 5 [(validator) = {min: 0, max: 100 }];
+	google.protobuf.Int32Value probability_of_non_aligned_forces = 6 [(validator) = {min: 0, max: 100 }];
+	FusionSourceTypeValue fusion_source_type = 7;
+	DetectingSensorTypeValue detecting_sensor_type = 8;
+	google.protobuf.DoubleValue slant_range_position_uncertainty = 9 [(validator) = {min: 0, max: 1000000 }];
+	google.protobuf.DoubleValue cross_range_position_uncertainty = 10 [(validator) = {min: 0, max: 1000000 }];
+	google.protobuf.DoubleValue vertical_position_uncertainty = 11 [(validator) = {min: 0, max: 1000000 }];
+	google.protobuf.DoubleValue uncertainty_orientation = 12 [(validator) = {min: 0, max: 90 }];
+	google.protobuf.DoubleValue uncertainty_tilt = 13 [(validator) = {min: 0, max: 90 }];
+}
+
+
+message CompositeDetails {
+	BlockBase base = 1 [(validator) = {isMandatory: true }];
+	repeated google.protobuf.StringValue op_ids = 2 [(info) = {dws: true }];
+	repeated ContributorCount contribute_counts = 3;
+	repeated AssociationPair association_pairs = 4;
+}
+
+
+message TaskMsg {
+	TaskTypesValue task_type = 2;
+	google.protobuf.Timestamp time_of_start = 4 [(validator) = {isMandatory: true }];
+	google.protobuf.FloatValue duration = 5 [(validator) = {isMandatory: true }];
+	NcctId task_target_id = 6;
+	repeated NcctId td_ids = 7;
+	Provenance provenance = 9;
+	TaskDetails task_details = 10 [(validator) = {isMandatory: true }];
+}
+
+
+message NncDataRepositoryFingerprintMsg {
+	google.protobuf.UInt32Value fingerprint_set_num = 2 [(validator) = {isMandatory: true }];
+	google.protobuf.UInt32Value seq_number = 3 [(validator) = {isMandatory: true }];
+	google.protobuf.UInt32Value seq_total = 4 [(validator) = {isMandatory: true }];
+	repeated MessageFingerprintSet fingerprints = 5;
+}
+
+
+message MessageFingerprintSet {
+	MessageInfo message_type = 1 [(validator) = {isMandatory: true }];
+	repeated MessageFingerprint fingerprints = 2;
+	google.protobuf.Int32Value geo_mask = 3 [(validator) = {isMandatory: true }];
+}
+
+
+message MessageFingerprint {
+	Uuid unique_id = 1 [(validator) = {isMandatory: true }];
+	google.protobuf.Timestamp timestamp = 2 [(validator) = {isMandatory: true }];
+}
+
+
+message NncDataRepositoryRequestMsg {
+	repeated MessageFingerprintSet requested_fingerprints = 2;
+}
+
+
+message AdvisoryMsg {
+	AdvisoryLevelValue advisory_level = 2 [(validator) = {isMandatory: true }];
+	AdvisoryCodeValue advisory_code = 3 [(validator) = {isMandatory: true }];
+	NcctId component_id1 = 4;
+	NcctId component_id2 = 5;
+	MessageInfo message_type = 6;
+	NcctId related_entity = 7;
+}
+
+
+message SensorAdjustment {
+	BlockBase base = 1 [(validator) = {isMandatory: true }];
+	NcctId adjustment_id = 2 [(validator) = {isMandatory: true }];
+	google.protobuf.UInt32Value sensor_nnc_id = 3 [(validator) = {min: 1, max: 2147483647, isMandatory: true }];
+	google.protobuf.UInt32Value sensor_sub_id_min = 4 [(validator) = {min: 0, max: 2147483647, isMandatory: true }];
+	google.protobuf.UInt32Value sensor_sub_id_max = 5 [(validator) = {min: 0, max: 2147483647, isMandatory: true }];
+	AdjustmentExcludeFlagValue exclude_type = 6 [(validator) = {isMandatory: true }];
+	Fov adjustment_fov = 7;
+	FrequencyRange frequency_range = 8;
+	google.protobuf.DoubleValue signal_noise_ratio_min = 9 [(validator) = {min: -200, max: 200 }];
+	google.protobuf.DoubleValue signal_noise_ratio_max = 10 [(validator) = {min: -200, max: 200 }];
+	google.protobuf.DoubleValue angle_sigma_weighting_factor = 11 [(validator) = {min: 0, max: 100 }];
+	google.protobuf.DoubleValue frequency_sigma_weighting_factor = 12 [(validator) = {min: 0, max: 100 }];
+	google.protobuf.DoubleValue frequency_weighting_factor = 14 [(validator) = {min: 0, max: 100 }];
+	google.protobuf.DoubleValue ellipse_weighting_factor = 15 [(validator) = {min: 0, max: 100 }];
+	google.protobuf.DoubleValue angle_sigma_offset = 16 [(validator) = {min: 0, max: 180 }];
+	google.protobuf.DoubleValue frequency_sigma_offset = 17 [(validator) = {min: 1, max: 2000000000 }];
+	google.protobuf.DoubleValue ellipse_axis_offset = 18;
+	google.protobuf.DoubleValue angle_bias_correction = 19 [(validator) = {min: -90, max: 90 }];
+	google.protobuf.DoubleValue frequency_bias_correction = 20 [(validator) = {min: -100000000, max: 100000000 }];
+}
+
+
+message SensorMeasurementAdjustmentMsg {
+	SensorAdjustment adjustment = 2;
+}
+
+
+message NcctIdInterestLevelMsg {
+	NcctId element_id = 2 [(validator) = {isMandatory: true }];
+	InterestLevelOfTrackValue interest_level = 3 [(validator) = {isMandatory: true }];
+}
+
+
+message RuleOfInteractionMsg {
+	google.protobuf.StringValue roi_name = 2 [(info) = {dws: true }];
+	Provenance source = 3 [(validator) = {isMandatory: true }];
+	CatalogTypeValue catalog = 4;
+	google.protobuf.Int32Value message_type = 5 [(validator) = {min: 0, max: 2147483647 }];
+	TaskTypesValue roi_action = 6 [(validator) = {isMandatory: true }];
+	google.protobuf.FloatValue task_duration = 7 [(validator) = {min: 0, max: 254 }];
+	google.protobuf.FloatValue time_variance = 8 [(validator) = {min: 0, max: 86400 }];
+	google.protobuf.BoolValue active = 9 [(validator) = {isMandatory: true }];
+	repeated RoiCondition conditions = 10;
+	ComintDetails comint_details = 11;
+	ElintDetails elint_details = 12;
+}
+
+
+message RoiCondition {
+	BlockBase base = 1 [(validator) = {isMandatory: true }];
+	RoiParameterTypeValue parameter_type = 2 [(validator) = {isMandatory: true }];
+	RoiConditionTypeValue condition_type = 3 [(validator) = {isMandatory: true }];
+	EmitterNotation emitter_notation = 4;
+	google.protobuf.Int32Value numeric_value1 = 5;
+	google.protobuf.Int32Value numeric_value2 = 6;
+}
+
+
+message TaskStateMsg {
+	NcctId task_id = 2 [(validator) = {isMandatory: true }];
+	repeated NcctId td_ids = 3;
+	repeated NcctId roi_ids = 4;
+	NcctId component_id = 7 [(validator) = {isMandatory: true }];
+	TaskStateValue task_state = 8 [(validator) = {isMandatory: true }];
+	google.protobuf.FloatValue task_duration = 9;
+	TaskTypesValue task_type = 10 [(validator) = {isMandatory: true }];
+	IdIdentifierValue referenced_id_type = 11;
+	NcctId referenced_id = 12;
+	oneof task_state_info {
+		TaskRejectionReasonValue task_rejection_reason = 13;
+		ManualAssociationRejectionReasonValue manual_association_rejection_reason = 14;
+		TaskCompletionTypeValue task_completion_type = 15;
+		NodeDesignationErrorDeprecatedValue node_designation_error_deprecated = 16;
+	}
+}
+
+
+message ContributorCount {
+	SensorTypeValue sensor = 1;
+	google.protobuf.Int32Value count = 2 [(validator) = {min: 0, max: 500 }];
+}
+
+
+message NcctEnvelopeMsg {
+	Security security_markings_banner = 1 [(validator) = {isMandatory: true }];
+	Security security_markings_portion = 65 [(validator) = {isMandatory: true }];
+	google.protobuf.Int32Value geo_mask = 2;
+	MessageInfo message_info = 3 [(validator) = {isMandatory: true }];
+	NcctId message_id = 4 [(validator) = {isMandatory: true }];
+	Uuid message_instance_id = 5 [(validator) = {isMandatory: true }];
+	google.protobuf.Int32Value source_nnc_id = 6 [(validator) = {isMandatory: true }];
+	google.protobuf.Int32Value source_sub_id = 7 [(validator) = {isMandatory: true }];
+	google.protobuf.Int32Value destination_nnc_id = 8 [(validator) = {isMandatory: true }];
+	google.protobuf.Int32Value destination_sub_id = 9 [(validator) = {isMandatory: true }];
+	VersionNumber icd_version = 11 [(validator) = {isMandatory: true }];
+	SimulationFlagValue simulation_flag = 12 [(validator) = {isMandatory: true }];
+	OperatingEnvironmentValue operating_environment = 13 [(validator) = {isMandatory: true }];
+	google.protobuf.Timestamp creation_time = 14 [(validator) = {isMandatory: true }];
+	google.protobuf.Timestamp expiration_time = 64 [(validator) = {isMandatory: true }];
+	repeated KeyValuePair kvps = 66;
+	oneof message {
+		LoggerMsg logger_msg = 16;
+		SubscriptionFilterMsg subscription_filter_msg = 17;
+		PlatformConfigurationMsg platform_configuration_msg = 19;
+		PlatformPositionMsg platform_position_msg = 20;
+		ImageRequestMsg image_request_msg = 21;
+		ImageDataMsg image_data_msg = 22;
+		TaskResponseMsg task_response_msg = 24;
+		AssociationMsg association_msg = 25;
+		DataLinkReportStatusMsg datalink_report_status_msg = 26;
+		DataLinkReportTaskMsg datalink_report_task_msg = 27;
+		DataAmplificationMsg data_amplification_msg = 28;
+		ChatMsg chat_msg = 30;
+		TargetDefinitionMsg target_definition_msg = 31;
+		NamedAreaOfInterestMsg named_area_of_interest_msg = 32;
+		RelationshipMsg relationship_msg = 33;
+		NcctConnectionMsg ncct_connection_msg = 34;
+		IcdRequestMsg icd_request_msg = 35;
+		DeleteMsg delete_msg = 36;
+		NetworkStatusMsg network_status_msg = 37;
+		PingInitiateMsg ping_initiate_msg = 38;
+		PingResponseMsg ping_response_msg = 39;
+		SubscriptionMsg subscription_msg = 40;
+		NncConnectionTableMsg nnc_connection_table_msg = 42;
+		NominationMsg nomination_msg = 43;
+		ExtendedInformationMsg extended_information_msg = 44;
+		GenericPayloadMsg generic_payload_msg = 45;
+		ConnectionInformationMsg connection_information_msg = 46;
+		NncLocalSubscriptionMsg nnc_local_subscription_msg = 47;
+		EntityReportMsg entity_report_msg = 48;
+		TaskMsg task_msg = 49;
+		NncDataRepositoryFingerprintMsg nnc_data_repository_fingerprint_msg = 50;
+		NncDataRepositoryRequestMsg nnc_data_repository_request_msg = 51;
+		SegmentRequestMsg segment_request_msg = 67;
+		AdvisoryMsg advisory_msg = 52;
+		SensorMeasurementAdjustmentMsg sensor_measurement_adjustment_msg = 57;
+		NcctIdInterestLevelMsg ncct_id_interest_level_msg = 58;
+		RuleOfInteractionMsg rule_of_interaction_msg = 59;
+		TaskStateMsg task_state_msg = 61;
+	}
+}
+
+
+message AdjustmentExcludeFlagValue {
+	AdjustmentExcludeFlag value = 1;
+}
+
+enum AdjustmentExcludeFlag {
+	AEF_ADJUSTMENT = 0;  //Adjustment
+	AEF_EXCLUSION = 1;  //Exclusion (all measurements)
+	AEF_ANGLE_EXCLUSION = 2;  //Angle Exclusion
+	AEF_ELLIPSE_EXCLUSION = 3;  //Ellipse Exclusion
+}
+
+
+message AdjustmentFlagValue {
+	AdjustmentFlag value = 1;
+}
+
+enum AdjustmentFlag {
+	AF_NO_ADJUSTMENT = 0;  //No adjustment
+	AF_ADJUSTED = 1;  //Adjusted
+}
+
+
+message AdvisoryCodeValue {
+	AdvisoryCode value = 1;
+}
+
+enum AdvisoryCode {
+	AC_NO_ADVISORY = 0;  //No Advisory
+	AC_DUPE_NNC_IN_NET = 1;  //Duplicate NNC Numbers
+	AC_TIME_SYNC_ERROR = 2;  //Time Synchronization Error
+	AC_NNC_COLD_START = 3;  //NNC has cold started
+	AC_NNC_WARM_START = 4;  //NNC has warm started
+	AC_INVALID_NCCT_ID = 5;  //Invalid use of NCCT ID
+	AC_MANDATORY_FIELD = 6;  //Mandatory fields not populated
+	AC_INVALID_SUBID = 7;  //Invalid SubID range for PIM connection
+	AC_LOG_SPACE_REACH = 8;  //Log space 90% threshold reached
+	AC_LOG_FILE_PURGE = 9;  //Log file purging initiated
+	AC_LOGGING_DISABLE = 10;  //Logging disabled due to insufficient log space
+	AC_APP_HALTED = 11;  //Application halted due to insufficient log space
+	AC_DATA_REPORT_TD = 12;  //Component generated data report against inactive TD ID
+	AC_INVALID_IBS = 13;  //Invalid IBS Reporting Node Designation
+	AC_INVALID_LINK_16 = 14;  //Invalid Link-16 Reporting Node Designation
+	AC_INVALID_GCCS_M = 15;  //Invalid GCCS-M Nominating Node Designation
+	AC_INVALID_JADOCS = 16;  //Invalid JADOCS Nominating Node Designation
+	AC_INVALID_ELINT_JICD_MASTER = 17;  //Invalid ELINT JICD Master Designation
+	AC_INVALID_ELINT_JICD_GATEWAY = 18;  //Invalid ELINT JICD Gateway Designation
+	AC_INVALID_TNG_JICD_GATEWAY = 19;  //Invalid TNG JICD Gateway Designation
+	AC_INVALID_FUSION = 20;  //Invalid Fusion Capable Designation
+	AC_REMOVE_IBS = 21;  //IBS Reporting Node Designation Removed
+	AC_REMOVE_LINK_16 = 22;  //Link-16 Reporting Node Designation Removed
+	AC_REMOVE_GCCS_M = 23;  //GCCS-M Nominating Node Designation Removed
+	AC_REMOVE_JADOCS = 24;  //JADOCS Nominating Node Designation Removed
+	AC_REMOVE_ELINT_JICD_MASTER = 25;  //ELINT JICD Master Designation Removed
+	AC_REMOVE_ELINT_JICD_GATEWAY = 26;  //ELINT JICD Gateway Designation Removed
+	AC_REMOVE_TNG_JICD_GATEWAY = 27;  //TNG JICD Gateway Designation Removed
+	AC_REMOVE_FUSION = 28;  //Fusion Capability Designation Removed
+	AC_VALUE_OUT_OF_RANGE = 29;  //ICD Field Value Out of Range
+	AC_UNKNOWN_TASK_ID = 30;  //Unknown Task ID
+	AC_INVALID_TASK_ID = 31;  //Invalid Task ID
+}
+
+
+message AdvisoryLevelValue {
+	AdvisoryLevel value = 1;
+}
+
+enum AdvisoryLevel {
+	AL_RESERVED = 0;  //Reserved
+	AL_NORMAL = 1;  //Normal
+	AL_WARNING = 2;  //Warning
+	AL_CRITICAL = 3;  //Critical
+	AL_DEBUG = 4;  //Debug
+	AL_GOOD = 5;  //Good
+}
+
+
+message AisAidTypeValue {
+	AisAidType value = 1;
+}
+
+enum AisAidType {
+	AAT_NOT_SPECIFIED = 0;  //Not Specified
+	AAT_REFERENCE_POINT = 1;  //Reference point
+	AAT_RACON = 2;  //RACON
+	AAT_FIXED_STRUCT_OFF_SHORE = 3;  //Fixed structure off shore
+	AAT_LIGHT = 4;  //Light, without sectors
+	AAT_LIGHT_WITH_SECTORS = 5;  //Light, with sectors
+	AAT_LEADING_LIGHT_FRONT = 6;  //Leading Light Front
+	AAT_LEADING_LIGHT_REAR = 7;  //Leading Light Rear
+	AAT_BEACON_N = 8;  //Beacon, Cardinal N
+	AAT_BEACON_E = 9;  //Beacon, Cardinal E
+	AAT_BEACON_S = 10;  //Beacon, Cardinal S
+	AAT_BEACON_W = 11;  //Beacon, Cardinal W
+	AAT_BEACON_PORT = 12;  //Beacon, Port hand
+	AAT_BEACON_STARBOARD = 13;  //Beacon, Starboard hand
+	AAT_BEACON_PREFERRED_CHANNEL_PORT = 14;  //Beacon, Preferred Channel port hand
+	AAT_BEACON_PREFERRED_CHANNEL_STARBOARD = 15;  //Beacon, Preferred Channel starboard hand
+	AAT_BEACON_ISOLATED_DANGER = 16;  //Beacon, Isolated danger
+	AAT_BEACON_SAFE_WATER = 17;  //Beacon, Safe water
+	AAT_BEACON_SPECIAL_MARK = 18;  //Beacon, Special mark
+	AAT_CARDINAL_N = 19;  //Cardinal Mark N
+	AAT_CARDINAL_E = 20;  //Cardinal Mark E
+	AAT_CARDINAL_S = 21;  //Cardinal Mark S
+	AAT_CARDINAL_W = 22;  //Cardinal Mark W
+	AAT_PORT_HAND = 23;  //Port hand Mark
+	AAT_STARBOARD_HAND = 24;  //Starboard hand Mark
+	AAT_PREFERRED_CHANNEL_PORT = 25;  //Preferred Channel Port hand
+	AAT_PREFERRED_CHANNEL_STARBOARD = 26;  //Preferred Channel Starboard hand
+	AAT_ISOLATED_DANGER = 27;  //Isolated danger
+	AAT_SAFE_WATER = 28;  //Safe Water
+	AAT_SPECIAL_MARK = 29;  //Special Mark
+	AAT_LIGHT_VESSESL_LANBY_RIGS = 30;  //Light Vessel/LANBY/Rigs
+}
+
+
+message AisEpfdTypeValue {
+	AisEpfdType value = 1;
+}
+
+enum AisEpfdType {
+	EPFD_UNDEFINED = 0;  //Undefined
+	EPFD_GPS = 1;  //GPS
+	EPFD_GLONASS = 2;  //GLONASS
+	EPFD_GPS_GLONASS = 3;  //GPS GLONASS
+	EPFD_LORANC = 4;  //LORANC
+	EPFD_CHAYKA = 5;  //CHAYKA
+	EPFD_INS = 6;  //INS
+	EPFD_SURVEYED = 7;  //SURVEYED
+	EPFD_GALILEO = 8;  //GALILEO
+}
+
+
+message AisNavigationStatusValue {
+	AisNavigationStatus value = 1;
+}
+
+enum AisNavigationStatus {
+	ANS_UNDERWAY_ENGINE = 0;  //Underway engine
+	ANS_AT_ANCHOR = 1;  //At anchor
+	ANS_NOT_UNDER_COMMAND = 2;  //Not under command
+	ANS_RESTRICTED_MANEURVERABILITY = 3;  //Restricted maneurverability
+	ANS_CONSTRAINED_BY_DRAUGHT = 4;  //Constrained by draught
+	ANS_MOORED = 5;  //Moored
+	ANS_AGROUND = 6;  //Aground
+	ANS_ENGAGED_IN_FISHING = 7;  //Engaged in fishing
+	ANS_UNDER_WAY_SAILING = 8;  //Under way sailing
+	ANS_UNKNOWN = 9;  //Unknown
+}
+
+
+message AisOffPositionIndicatorValue {
+	AisOffPositionIndicator value = 1;
+}
+
+enum AisOffPositionIndicator {
+	OPI_ON = 0;  //On
+	OPI_OFF = 1;  //Off
+}
+
+
+message AisPositionUncertaintyIndicatorValue {
+	AisPositionUncertaintyIndicator value = 1;
+}
+
+enum AisPositionUncertaintyIndicator {
+	PUI_LESS_10 = 0;  //Less than 10 m of accuracy
+	PUI_MORE_10 = 1;  //More than 10 m of accuracy
+}
+
+
+message AisShipTypeValue {
+	AisShipType value = 1;
+}
+
+enum AisShipType {
+	AST_NOT_AVAILABLE = 0;  //Not available
+	AST_WIG_ALL = 1;  //Wing in ground (WIG), all ships of this type
+	AST_WIG_HAZ_A = 2;  //Wing in ground (WIG), Hazardous category A
+	AST_WIG_HAZ_B = 3;  //Wing in ground (WIG), Hazardous category B
+	AST_WIG_HAZ_C = 4;  //Wing in ground (WIG), Hazardous category C
+	AST_WIG_HAZ_D = 5;  //Wing in ground (WIG), Hazardous category D
+	AST_WIG_NO_INFO = 6;  //Wing in ground (WIG), No additional information
+	AST_FISHING = 7;  //Fishing
+	AST_TOWING = 8;  //Towing
+	AST_TOWING_200M_25M = 9;  //Towing: length exceeds 200m or breadth exceeds 25m
+	AST_DREDGING_UNDERWATER = 10;  //Dredging or underwater op
+	AST_DIVING_OPS = 11;  //Diving ops
+	AST_MILITARY_OPS = 12;  //Military ops
+	AST_SAILING = 13;  //Sailing
+	AST_PLEASURE_CRAFT = 14;  //Pleasure Craft
+	AST_HSC_ALL = 15;  //High speed craft (HSC), all ships of this type
+	AST_HSC_HAZ_A = 16;  //High speed craft (HSC), Hazardous category A
+	AST_HSC_HAZ_B = 17;  //High speed craft (HSC), Hazardous category B
+	AST_HSC_HAZ_C = 18;  //High speed craft (HSC), Hazardous category C
+	AST_HSC_HAZ_D = 19;  //High speed craft (HSC), Hazardous category D
+	AST_HSC_NO_INFO = 20;  //High speed craft (HSC), No additional information
+	AST_PILOT_VESSEL = 21;  //Pilot Vessel
+	AST_SAR = 22;  //Search and Rescue vessel
+	AST_TUG = 23;  //Tug
+	AST_PORT_TENDER = 24;  //Port Tender
+	AST_ANTI_POLLUTION_EQUIP = 25;  //Anti-pollution equipment
+	AST_LAW_ENFORCEMENT = 26;  //Law Enforcement
+	AST_LOCAL_VESSEL_1 = 27;  //Local Vessel 1
+	AST_LOCAL_VESSEL_2 = 28;  //Local Vessel 2
+	AST_MEDICAL_TRANSPORT = 29;  //Medical Transport
+	AST_SHIP_RR_RESOLUTION_18 = 30;  //Ship according to RR Resolution No. 18
+	AST_PASSENGER_ALL = 31;  //Passenger, all ships of this type
+	AST_PASSENGER_HAZ_A = 32;  //Passenger, Hazardous category A
+	AST_PASSENGER_HAZ_B = 33;  //Passenger, Hazardous category B
+	AST_PASSENGER_HAZ_C = 34;  //Passenger, Hazardous category C
+	AST_PASSENGER_HAZ_D = 35;  //Passenger, Hazardous category D
+	AST_PASSENGER_NO_INFO = 36;  //Passenger, No additional information
+	AST_CARGO_ALL = 37;  //Cargo, all ships of this type
+	AST_CARGO_HAZ_A = 38;  //Cargo, Hazardous category A
+	AST_CARGO_HAZ_B = 39;  //Cargo, Hazardous category B
+	AST_CARGO_HAZ_C = 40;  //Cargo, Hazardous category C
+	AST_CARGO_HAZ_D = 41;  //Cargo, Hazardous category D
+	AST_CARGO_NO_INFO = 42;  //Cargo, No additional information
+	AST_TANKER_ALL = 43;  //Tanker, all ships of this type
+	AST_TANKER_HAZ_A = 44;  //Tanker, Hazardous category A
+	AST_TANKER_HAZ_B = 45;  //Tanker, Hazardous category B
+	AST_TANKER_HAZ_C = 46;  //Tanker, Hazardous category C
+	AST_TANKER_HAZ_D = 47;  //Tanker, Hazardous category D
+	AST_TANKER_NO_INFO = 48;  //Tanker, No additional information
+	AST_OTHER_ALL = 49;  //Other Type, all ships of this type
+	AST_OTHER_HAZ_A = 50;  //Other Type, Hazardous category A
+	AST_OTHER_HAZ_B = 51;  //Other Type, Hazardous category B
+	AST_OTHER_HAZ_C = 52;  //Other Type, Hazardous category C
+	AST_OTHER_HAZ_D = 53;  //Other Type, Hazardous category D
+	AST_OTHER_NO_INFO = 54;  //Other Type, No additional information
+}
+
+
+message AisStationTypeValue {
+	AisStationType value = 1;
+}
+
+enum AisStationType {
+	ATST_UNKNOWN = 0;  //Unknown
+	ATST_VESSEL_CLASSA = 1;  //Vessel class a
+	ATST_VESSEL_CLASSB = 2;  //Vessel class b
+	ATST_BASE_STATION = 3;  //Base station
+	ATST_AID_TO_NAVIGATION = 4;  //Aid to navigation
+	ATST_SEARCH_AND_RESCUE = 5;  //Search and rescue
+}
+
+
+message AltitudeSourceValue {
+	AltitudeSource value = 1;
+}
+
+enum AltitudeSource {
+	AS_UNKNOWN = 0;  //Unknown
+	AS_ESTIMATED = 1;  //Estimated
+	AS_SENSOR = 2;  //Sensor
+	AS_MANUAL_AIRCRAFT_REPORT = 3;  //Manual Aircraft Report
+	AS_AUTOMATIC_AIRCRAFT_REPORT = 4;  //Automatic Aircraft Report
+}
+
+
+message AmplificationConfidence1Value {
+	AmplificationConfidence1 value = 1;
+}
+
+enum AmplificationConfidence1 {
+	AC1_UNKNOWN = 0;  //Unknown
+	AC1_0_THROUGH_33_PERCENT = 1;  //0 Through 33%
+	AC1_34_THROUGH_66_PERCENT = 2;  //34 Through 66%
+	AC1_67_THROUGH_90_PERCENT = 3;  //67 Through 90%
+	AC1_91_THROUGH_97_PERCENT = 4;  //91 Through 97%
+	AC1_GREATER_THAN_OR_EQUAL_TO_98_PERCENT = 5;  //Greater than or equal to 98%
+}
+
+
+message AmplificationConfidence2Value {
+	AmplificationConfidence2 value = 1;
+}
+
+enum AmplificationConfidence2 {
+	AC2_UNKNOWN = 0;  //Unknown
+	AC2_0_0_THROUGH_3_2_PERCENT = 1;  //0.0 THROUGH 3.2%
+	AC2_3_3_THROUGH_6_5_PERCENT = 2;  //3.3 THROUGH 6.5%
+	AC2_6_6_THROUGH_9_7_PERCENT = 3;  //6.6 THROUGH 9.7%
+	AC2_9_8_THROUGH_12_9_PERCENT = 4;  //9.8 THROUGH 12.9%
+	AC2_13_0_THROUGH_16_1_PERCENT = 5;  //13.0 THROUGH 16.1%
+	AC2_16_2_THROUGH_19_4_PERCENT = 6;  //16.2 THROUGH 19.4%
+	AC2_19_5_THROUGH_22_6_PERCENT = 7;  //19.5 THROUGH 22.6%
+	AC2_22_7_THROUGH_25_8_PERCENT = 8;  //22.7 THROUGH 25.8%
+	AC2_25_9_THROUGH_29_1_PERCENT = 9;  //25.9 THROUGH 29.1%
+	AC2_29_2_THROUGH_32_3_PERCENT = 10;  //29.2 THROUGH 32.3%
+	AC2_32_4_THROUGH_35_5_PERCENT = 11;  //32.4 THROUGH 35.5%
+	AC2_35_6_THROUGH_38_8_PERCENT = 12;  //35.6 THROUGH 38.8%
+	AC2_38_9_THROUGH_42_0_PERCENT = 13;  //38.9 THROUGH 42.0%
+	AC2_42_1_THROUGH_45_2_PERCENT = 14;  //42.1 THROUGH 45.2%
+	AC2_45_3_THROUGH_48_4_PERCENT = 15;  //45.3 THROUGH 48.4%
+	AC2_48_5_THROUGH_51_7_PERCENT = 16;  //48.5 THROUGH 51.7%
+	AC2_51_8_THROUGH_54_9_PERCENT = 17;  //51.8 THROUGH 54.9%
+	AC2_55_0_THROUGH_58_1_PERCENT = 18;  //55.0 THROUGH 58.1%
+	AC2_58_2_THROUGH_61_4_PERCENT = 19;  //58.2 THROUGH 61.4%
+	AC2_61_5_THROUGH_64_6_PERCENT = 20;  //61.5 THROUGH 64.6%
+	AC2_64_7_THROUGH_67_8_PERCENT = 21;  //64.7 THROUGH 67.8%
+	AC2_67_9_THROUGH_71_1_PERCENT = 22;  //67.9 THROUGH 71.1%
+	AC2_71_2_THROUGH_74_3_PERCENT = 23;  //71.2 THROUGH 74.3%
+	AC2_74_4_THROUGH_77_5_PERCENT = 24;  //74.4 THROUGH 77.5%
+	AC2_77_6_THROUGH_80_7_PERCENT = 25;  //77.6 THROUGH 80.7%
+	AC2_80_8_THROUGH_84_0_PERCENT = 26;  //80.8 THROUGH 84.0%
+	AC2_84_1_THROUGH_87_2_PERCENT = 27;  //84.1 THROUGH 87.2%
+	AC2_87_3_THROUGH_90_4_PERCENT = 28;  //87.3 THROUGH 90.4%
+	AC2_90_5_THROUGH_93_7_PERCENT = 29;  //90.5 THROUGH 93.7%
+	AC2_93_8_THROUGH_96_9_PERCENT = 30;  //93.8 THROUGH 96.9%
+	AC2_97_0_THROUGH_100_0_PERCENT = 31;  //97.0 THROUGH 100.0%
+}
+
+
+message ArchiveFlagValue {
+	ArchiveFlag value = 1;
+}
+
+enum ArchiveFlag {
+	TDAF_REPORT_DATA = 0;  //Report data
+	TDAF_COLLECT_ONLY = 1;  //Collect only
+}
+
+
+message AssociationReasonValue {
+	AssociationReason value = 1;
+}
+
+enum AssociationReason {
+	AR_OTHER = 0;  //Other
+	AR_PARAMETRIC_CORRELATION = 1;  //Elements are the same/parametric correlation
+	AR_COLOCATED = 2;  //Elements are co-located
+	AR_SAME_SITE = 3;  //Elements are part of the same target site
+	AR_SUBORDINATE = 4;  //Element is subordinate
+	AR_HIGHER_ECHELON = 5;  //Element is higher echelon
+	AR_EW_CORRELATION = 6;  //EW to EW correlation
+	AR_IE_CORRELATION = 7;  //Intercept-to-emitter correlation
+	AR_REMOTE_DATALINK_CORRELATION = 8;  //Elements are the same ??? Remote data link correlation
+	AR_RECOMBINE_TFM_DATA = 9;  //Recombine TFM Data
+	AR_GROUP_TRACK = 10;  //Group Track
+}
+
+
+message AssociationTypeValue {
+	AssociationType value = 1;
+}
+
+enum AssociationType {
+	AT_OTHER = 0;  //Other
+	AT_MANUAL = 1;  //Manual
+	AT_AUTOMATIC = 2;  //Automatic
+	AT_OVERRIDE = 3;  //Manual Override
+}
+
+
+message AudioFormatValue {
+	AudioFormat value = 1;
+}
+
+enum AudioFormat {
+	AF_MP3 = 0;  //MP3
+	AF_WAV = 1;  //WAV
+	AF_MP4 = 2;  //MP4
+	AF_OGG = 3;  //OGG
+	AF_AU = 4;  //AU
+	AF_FLAC = 5;  //FLAC
+	AF_PCM = 6;  //PCM
+	AF_LOGARITHMIC_MLAW_8BIT_8KHZ = 7;  //LOGARITHMIC_MLAW_8BIT_8KHZ
+	AF_LOGARITHMIC_ALAW_8BIT_8KHZ = 8;  //LOGARITHMIC_ALAW_8BIT_8KHZ
+	AF_UNSIGNED_LINEAR_8BIT = 9;  //UNSIGNED_LINEAR_8BIT
+	AF_UNSIGNED_LINEAR_16BIT = 10;  //UNSIGNED_LINEAR_16BIT
+	AF_SIGNED_LINEAR_8BIT = 11;  //SIGNED_LINEAR_8BIT
+	AF_SIGNED_LINEAR_16BIT = 12;  //SIGNED_LINEAR_16BIT
+	AF_LOGARITHMIC_MLAW_8BIT_16KHZ = 13;  //LOGARITHMIC_MLAW_8BIT_16KHZ
+	AF_LOGARITHMIC_ALAW_8BIT_16KHZ = 14;  //LOGARITHMIC_ALAW_8BIT_16KHZ
+	AF_UNSIGNED_LINEAR_16BIT_16KHZ = 15;  //UNSIGNED_LINEAR_16BIT_16KHZ
+	AF_SPEEX_NARROWBAND = 16;  //SPEEX_NARROWBAND
+	AF_SPEEX_WIDEBAND = 17;  //SPEEX_WIDEBAND
+}
+
+
+message CapabilityTypeValue {
+	CapabilityType value = 1;
+}
+
+enum CapabilityType {
+	CAP_NOT_USED = 0;  //Not used
+	CAP_LINK_16_DATA_LINK_REPORTING = 1;  //Link 16 data link reporting
+	CAP_IBS_DATA_LINK_REPORTING = 2;  //IBS data link reporting
+	CAP_GCCS_M_TARGETING_CELL_NOMINATION = 3;  //GCCS M targeting cell nomination
+	CAP_JADOCS_TARGETING_CELL_NOMINATION = 4;  //JADOCS targeting cell nomination
+	CAP_ELINT_JICD_GATEWAY = 5;  //ELINT JICD gateway
+	CAP_TNG_JICD_GATEWAY = 6;  //TNG JICD gateway
+	CAP_ELINT_JICD_MASTER = 7;  //ELINT JICD master
+	CAP_FUSION_ENGINE = 8;  //Fusion Engine
+}
+
+
+message CartesianCoordinateReferenceValue {
+	CartesianCoordinateReference value = 1;
+}
+
+enum CartesianCoordinateReference {
+	CC_ECEF = 0;  //Earth centered earth fixed
+	CC_LOCAL_PLANE = 1;  //Local plane
+}
+
+
+message CatalogTypeValue {
+	CatalogType value = 1;
+}
+
+enum CatalogType {
+	CT_NCCT_5 = 0;  //NCCT 5 Catalog
+	CT_NCCT_4 = 1;  //NCCT 4 Catalog
+	CT_ELINT_JICD = 2;  //ELINT JICD Catalog
+	CT_COMINT_JICD = 3;  //COMINT JICD Catalog
+	CT_STANAG_4607 = 4;  //STANAG 4607 Catalog
+}
+
+
+message ChangeDetectionValue {
+	ChangeDetection value = 1;
+}
+
+enum ChangeDetection {
+	CD_NONE = 0;  //None
+	CD_SMALL_VEHICLE = 1;  //Small vehicle
+	CD_MEDIUM_VEHICLE = 2;  //Medium vehicle
+	CD_LARGE_VEHICLE = 3;  //Large vehicle
+	CD_SINGLE_VEHICLE = 4;  //Single vehicle
+	CD_MULTIPLE_VEHICLES = 5;  //Multiple vehicles
+	CD_DISMOUNT = 6;  //Dismount
+	CD_DISTURBED_EARTH = 7;  //Disturbed earth
+	CD_BURIED_WIRE = 8;  //Buried wire
+}
+
+
+message CocomBitMaskTypeValue {
+	CocomBitMaskType value = 1;
+}
+
+enum CocomBitMaskType {
+	CBMT_NONE = 0;  //None
+	CBMT_AFRICOM = 33554432;  //AFRICOM - 0x02000000
+	CBMT_CENTCOM = 67108864;  //CENTCOM - 0x04000000
+	CBMT_EUCOM = 134217728;  //EUCOM - 0x08000000
+	CBMT_NORTHCOM = 268435456;  //NORTHCOM - 0x10000000
+	CBMT_PACOM = 536870912;  //PACOM - 0x20000000
+	CBMT_SOUTHCOM = 1073741824;  //SOUTHCOM - 0x40000000
+}
+
+
+message CollateralAmpInformationValue {
+	CollateralAmpInformation value = 1;
+}
+
+enum CollateralAmpInformation {
+	CAI_Civilian = 0;  //Civilian
+	CAI_Military = 1;  //Additional military weapons, equipment, personnel
+	CAI_Nothing = 2;  //Nothing found
+}
+
+
+message CollectionTaskTypeValue {
+	CollectionTaskType value = 1;
+}
+
+enum CollectionTaskType {
+	CLTT_HISTORY_COLLECT = 0;  //History Collect
+	CLTT_IDENTITY_COLLECT = 1;  //Identity Collect
+}
+
+
+message CollectionTypeValue {
+	CollectionType value = 1;
+}
+
+enum CollectionType {
+	CLT_NORMAL_COLLECTION = 0;  //Normal Collection
+	CLT_PRECISION_COLLECTION = 1;  //Precision Collection
+}
+
+
+message ComintModulationTypeValue {
+	ComintModulationType value = 1;
+}
+
+enum ComintModulationType {
+	CMT_AM = 0;  //AM
+	CMT_FM = 2;  //FM
+	CMT_PSK = 4;  //PSK
+	CMT_BPSK = 5;  //BPSK
+	CMT_QPSK = 6;  //QPSK
+	CMT_8PSK = 7;  //8PSK
+	CMT_16PSK = 8;  //16PSK
+	CMT_32PSK = 9;  //32PSK
+	CMT_64PSK = 10;  //64PSK
+	CMT_FSK = 11;  //FSK
+	CMT_BFSK = 12;  //BFSK
+	CMT_QFSK = 13;  //QFSK
+	CMT_8FSK = 14;  //8FSK
+	CMT_16FSK = 15;  //16FSK
+	CMT_32FSK = 16;  //32FSK
+	CMT_64FSK = 17;  //64FSK
+	CMT_MSK = 18;  //MSK
+	CMT_BMSK = 19;  //BMSK
+	CMT_QMSK = 20;  //QMSK
+	CMT_8MSK = 21;  //8MSK
+	CMT_16MSK = 22;  //16MSK
+	CMT_32MSK = 23;  //32MSK
+	CMT_64MSK = 24;  //64MSK
+	CMT_LSB_Lower_Side_Band = 25;  //LSB (Lower Side Band)
+	CMT_USB_Upper_Side_Band = 26;  //USB (Upper Side Band)
+	CMT_DSB = 27;  //DSB
+	CMT_DSBSC = 28;  //DSBSC
+	CMT_DSBWC = 29;  //DSBWC
+	CMT_DSBRC = 30;  //DSBRC
+	CMT_SSB = 31;  //SSB
+	CMT_SSBSC = 32;  //SSBSC
+	CMT_SSBWC = 33;  //SSBWC
+	CMT_SSBRC = 34;  //SSBRC
+	CMT_ISB = 35;  //ISB
+	CMT_VSB = 36;  //VSB
+	CMT_PM = 37;  //PM
+	CMT_QAM_Analog = 38;  //QAM (Analog)
+	CMT_SM = 39;  //SM
+	CMT_OOK = 40;  //OOK
+	CMT_MFSK = 41;  //MFSK
+	CMT_AFSK = 42;  //AFSK
+	CMT_CPFSK = 43;  //CPFSK
+	CMT_ASK = 44;  //ASK
+	CMT_CPSK = 45;  //CPSK
+	CMT_DBPSK = 46;  //DBPSK
+	CMT_DQPSK = 47;  //DQPSK
+	CMT_OQPSK = 48;  //OQPSK
+	CMT_DPSK = 49;  //DPSK
+	CMT_PI_4_QPSK = 50;  //??/4-QPSK
+	CMT_SOQPSK = 51;  //SOQPSK
+	CMT_FQPSK = 52;  //FQPSK
+	CMT_QAM_Digital = 53;  //QAM (Digital)
+	CMT_GMSK = 54;  //GMSK
+	CMT_CPM = 55;  //CPM
+	CMT_PPM = 56;  //PPM
+	CMT_TCM = 57;  //TCM
+	CMT_OFDM = 58;  //OFDM
+	CMT_FHSS = 59;  //FHSS
+	CMT_DSSS = 60;  //DSSS
+}
+
+
+message CompressionTypeValue {
+	CompressionType value = 1;
+}
+
+enum CompressionType {
+	CT_NO_COMPRESSION = 0;  //No compression
+	CT_LZW = 1;  //LZW compression
+}
+
+
+message ConnectionStatusValue {
+	ConnectionStatus value = 1;
+}
+
+enum ConnectionStatus {
+	CS_DISCONNECTED = 0;  //Disconnected
+	CS_CONNECTED = 1;  //Connected
+	CS_CONNECTION_LOST_DUE_TO_ERROR = 2;  //Connection lost due to error
+	CS_CONNECTION_REGISTRATION = 3;  //Connection registration
+	CS_CONNECTION_REGISTRATION_FAILED = 4;  //Connection registration failed
+}
+
+
+message CorrelationSourceValue {
+	CorrelationSource value = 1;
+}
+
+enum CorrelationSource {
+	CS_Other = 0;  //Other
+	CS_User = 1;  //User
+	CS_NFE = 2;  //NFE
+	CS_MFE = 3;  //MFE
+	CS_MINER = 4;  //MINER
+	CS_BFE = 5;  //BFE
+	CS_Link16 = 6;  //Link16
+	CS_RJ_FDP = 7;  //RJ_FDP
+	CS_MINOTAUR = 8;  //MINOTAUR
+	CS_FUSION_PROCESSOR = 9;  //FUSION_PROCESSOR
+}
+
+
+message DecoyValue {
+	Decoy value = 1;
+}
+
+enum Decoy {
+	DEC_RESERVED = 0;  //Reserved
+	DEC_DECOY = 1;  //Decoy
+	DEC_VALID_TARGET = 2;  //Valid Target
+}
+
+
+message DetectingSensorTypeValue {
+	DetectingSensorType value = 1;
+}
+
+enum DetectingSensorType {
+	DST_UNKNOWN = 0;  //Unknown
+	DST_TELEVISION = 1;  //Television
+	DST_INFRARED = 2;  //Infrared
+	DST_ELECTRONIC_WARFARE_SUPPORT = 3;  //Electronic Warfare Support
+	DST_JAM_STROBE = 4;  //Jam Strobe
+	DST_VISUAL = 5;  //Visual
+	DST_RADAR = 6;  //Radar
+	DST_ANTI_RADIATION_MISSILE__ARM_ = 7;  //Anti-radiation missile (ARM)
+	DST_LASER_DETECTOR_TRACKER = 8;  //Laser detector tracker
+	DST_RADAR_WARNING_RECEIVER = 9;  //Radar warning receiver
+	DST_SENSOR_FUSION_DATA__SENSOR_NOT_STATED_ = 10;  //Sensor fusion data (sensor not stated)
+	DST_PASSIVE_RADAR = 11;  //Passive radar
+}
+
+
+message EmergencyTypeValue {
+	EmergencyType value = 1;
+}
+
+enum EmergencyType {
+	ET_OTHER = 0;  //Other
+	ET_DOWN_AIRCRAFT = 1;  //Down Aircraft
+	ET_MAN_IN_WATER = 2;  //Man in water
+	ET_DITCHING = 3;  //Ditching
+	ET_BAILOUT = 4;  //Bailout
+	ET_DISTRESSED_VESSEL = 5;  //Distressed Vessel
+}
+
+
+message EmitterNotationTypeValue {
+	EmitterNotationType value = 1;
+}
+
+enum EmitterNotationType {
+	EM_ELNOT = 0;  //ELNOT
+	EM_CENOT = 1;  //CENOT
+	EM_RESERVED_1 = 2;  //Reserved Value 1
+	EM_RESERVED_2 = 3;  //Reserved Value 2
+	EM_RESERVED_3 = 4;  //Reserved Value 3
+	EM_RESERVED_4 = 5;  //Reserved Value 4
+	EM_RESERVED_5 = 6;  //Reserved Value 5
+	EM_RESERVED_6 = 7;  //Reserved Value 6
+	EM_RESERVED_7 = 8;  //Reserved Value 7
+	EM_RESERVED_8 = 9;  //Reserved Value 8
+	EM_RESERVED_9 = 10;  //Reserved Value 9
+	EM_RESERVED_10 = 11;  //Reserved Value 10
+	EM_RESERVED_11 = 12;  //Reserved Value 11
+	EM_RESERVED_12 = 13;  //Reserved Value 12
+	EM_RESERVED_13 = 14;  //Reserved Value 13
+	EM_RESERVED_14 = 15;  //Reserved Value 14
+	EM_RESERVED_15 = 16;  //Reserved Value 15
+	EM_RESERVED_16 = 17;  //Reserved Value 16
+	EM_RESERVED_17 = 18;  //Reserved Value 17
+	EM_RESERVED_18 = 19;  //Reserved Value 18
+	EM_RESERVED_19 = 20;  //Reserved Value 19
+}
+
+
+message EmitterStatusTypeValue {
+	EmitterStatusType value = 1;
+}
+
+enum EmitterStatusType {
+	ES_UNKNOWN = 0;  //Reserved
+	ES_INACTIVE = 1;  //Inactive
+	ES_TARGET_EMITTER_ACTIVE = 2;  //Target emitter active
+	ES_TARGET_EMITTER_IN_SEARCH = 3;  //Target emitter in search
+	ES_TARGET_EMITTER_IN_TRACK = 4;  //Target emitter in track
+	ES_MISSILE_LAUNCH = 5;  //Missile launch
+}
+
+
+message EngagedValue {
+	Engaged value = 1;
+}
+
+enum Engaged {
+	E_NOT_ENGAGED = 0;  //Not Engaged
+	E_ENGAGED = 1;  //Engaged
+}
+
+
+message EnvironmentValue {
+	Environment value = 1;
+}
+
+enum Environment {
+	ENV_UNKNOWN = 0;  //Unknown (Z)
+	ENV_SEA_SURFACE = 1;  //Sea Surface (S)
+	ENV_SEA_SUBSURFACE = 2;  //Sea Sub-Surface (U)
+	ENV_GROUND = 3;  //Ground (G)
+	ENV_AIR = 4;  //Air (A)
+	ENV_SPACE = 5;  //Space (P)
+	ENV_SOF = 6;  //SOF (F)
+	ENV_OTHER = 7;  //Other (X)
+}
+
+
+message FusionDataFormatValue {
+	FusionDataFormat value = 1;
+}
+
+enum FusionDataFormat {
+	FF_NOT_USED = 0;  //Not Used
+	FF_ELINT = 1;  //ELINT
+	FF_COMINT = 2;  //COMINT
+	FF_MTI = 3;  //MTI
+	FF_IMINT = 4;  //IMINT
+	FF_AMTI = 5;  //AMTI
+	FF_MASINT = 6;  //MASINT
+	FF_HUMINT = 7;  //HUMINT
+	FF_COMINT_ADVANCED = 8;  //COMINT_ADVANCED
+}
+
+
+message FusionProductTypeValue {
+	FusionProductType value = 1;
+}
+
+enum FusionProductType {
+	FPT_Correlation = 0;  //Correlation
+	FPT_Association = 1;  //Association
+	FPT_Enrichment = 2;  //Enrichment
+	FPT_Tracking = 5;  //Tracking
+	FPT_Compositing = 6;  //Compositing
+	FPT_ActivityIdentification = 7;  //Activity Identification
+	FPT_ThreatIdentification = 8;  //Threat Identification
+}
+
+
+message FusionSourceTypeValue {
+	FusionSourceType value = 1;
+}
+
+enum FusionSourceType {
+	FST_SENSOR_FUSION = 0;  //Sensor fusion
+	FST_DATA_FUSION = 1;  //Data fusion
+}
+
+
+message GeoTypeValue {
+	GeoType value = 1;
+}
+
+enum GeoType {
+	GT_UNKNOWN = 0;  //Unknown
+	GT_POINT = 1;  //Point
+	GT_POLYGON = 3;  //Polygon
+	GT_LINE_OF_BEARING = 4;  //Line of Bearing (LOB)
+	GT_CONE_ANGLE = 5;  //Cone Angle
+	GT_CIRCLE = 6;  //Circle
+	GT_LINE_OF_BEARING_FIX = 7;  //Line of Bearing (LOB) Fix
+	GT_CONE_ANGLE_FIX = 8;  //Cone Angle Fix
+	GT_SECTOR = 9;  //Sector
+	GT_BOUNDING_BOX = 10;  //Bounding Box
+}
+
+
+message IdentityValue {
+	Identity value = 1;
+}
+
+enum Identity {
+	IDENT_PENDING = 0;  //Pending (P)
+	IDENT_UNKNOWN = 1;  //Unknown (U)
+	IDENT_ASSUMED_FRIEND = 2;  //Assumed Friend (A)
+	IDENT_FRIEND = 3;  //Friend (F)
+	IDENT_NEUTRAL = 4;  //Neutral (N)
+	IDENT_SUSPECT = 5;  //Suspect (S)
+	IDENT_HOSTILE = 6;  //Hostile (H)
+	IDENT_EXERCISE_PENDING = 7;  //Exercise Pending (G)
+	IDENT_EXERCISE_UNKNOWN = 8;  //Exercise Unknown (W)
+	IDENT_EXERCISE_ASSUMED_FRIEND = 9;  //Exercise Assumed Friend (M)
+	IDENT_EXERCISE_FRIEND = 10;  //Exercise Friend (D)
+	IDENT_EXERCISE_NEUTRAL = 11;  //Exercise Neutral (?)
+	IDENT_FAKER = 12;  //Faker (F)
+	IDENT_JOKER = 13;  //Joker (J)
+	IDENT_KILO = 14;  //Kilo (?)
+	IDENT_TRAVELER = 15;  //Traveler (?)
+	IDENT_ZOMBIE = 16;  //Zombie (?)
+}
+
+
+message IdIdentifierValue {
+	IdIdentifier value = 1;
+}
+
+enum IdIdentifier {
+	IDID_COMPONENT_ID = 0;  //Component Id
+	IDID_NCCT_ID = 1;  //NCCT Id
+	IDID_TD_ID = 2;  //TD Id
+	IDID_NAI_ID = 3;  //NAI Id
+	IDID_ROI_ID = 4;  //ROI Id
+	IDID_TASK_ID = 5;  //Task Id
+	IDID_AMP_ID = 6;  //Amp Id
+	IDID_INTEREST_LEVEL_ID = 7;  //Interest Level Id
+	IDID_ADJUSTMENT_ID = 8;  //Adjustment Id
+	IDID_IMAGE_ID = 9;  //Image Id
+}
+
+
+message IdRequestTypeValue {
+	IdRequestType value = 1;
+}
+
+enum IdRequestType {
+	IRT_None = 0;  //No Request
+	IRT_Assigned = 1;  //Request for NNC to assign a SubID
+	IRT_AssignedBlock = 2;  //Request for NNC to assign a block of SubIDs
+	IRT_Requested = 3;  //Request for client specified SubID
+	IRT_RequestedBlock = 4;  //Request for client specified block of SubIDs
+}
+
+
+message IdSourceValue {
+	IdSource value = 1;
+}
+
+enum IdSource {
+	IDS_NOT_USED = 0;  //Not used
+	IDS_IA = 1;  //IA
+	IDS_ATR = 2;  //ATR
+	IDS_UNKNOWN = 3;  //Unknown
+	IDS_CHANGE_DETECTION = 4;  //Change detection
+	IDS_MIDB = 5;  //MIDB
+}
+
+
+message IffInterrogationStatusValue {
+	IffInterrogationStatus value = 1;
+}
+
+enum IffInterrogationStatus {
+	IFFIS_RESERVED = 0;  //Reserved
+	IFFIS_NOT_INTERROGATED = 1;  //Not interrogated
+	IFFIS_NO_REPLY = 2;  //No reply
+	IFFIS_INVALID_REPLY = 3;  //Invalid reply
+	IFFIS_VALID_REPLY = 4;  //Valid reply
+}
+
+
+message IffInterrogationResponseValue {
+	IffInterrogationResponse value = 1;
+}
+
+enum IffInterrogationResponse {
+	IFFIR_NONE_RECEIVED = 0;  //None Received
+	IFFIR_FRIEND = 1;  //Friend
+	IFFIR_UNABLE_TO_EVALUATE = 2;  //Unable to Evaluate
+	IFFIR_HOSTILE = 3;  //Hostile
+}
+
+
+message IffModeValue {
+	IffMode value = 1;
+}
+
+enum IffMode {
+	IFFM_RESERVED = 0;  //Reserved
+	IFFM_MODE1 = 1;  //Mode 1
+	IFFM_MODE2 = 2;  //Mode 2
+	IFFM_MODE3 = 3;  //Mode 3
+	IFFM_MODE4 = 4;  //Mode 4
+	IFFM_MODE_C = 6;  //Mode C
+}
+
+
+message IffMode5NationalOriginValue {
+	IffMode5NationalOrigin value = 1;
+}
+
+enum IffMode5NationalOrigin {
+	NO_UNKNOWN = 0;  //UNKNOWN
+	NO_ALBANIA = 1;  //ALBANIA
+	NO_BELGIUM = 2;  //BELGIUM
+	NO_BULGARIA = 3;  //BULGARIA
+	NO_CANADA = 4;  //CANADA
+	NO_CROATIA = 5;  //CROATIA
+	NO_CZECH_REPUBLIC = 6;  //CZECH REPUBLIC
+	NO_DENMARK = 7;  //DENMARK
+	NO_ESTONIA = 8;  //ESTONIA
+	NO_FRANCE = 9;  //FRANCE
+	NO_GERMANY = 10;  //GERMANY
+	NO_GREECE = 11;  //GREECE
+	NO_HUNGARY = 12;  //HUNGARY
+	NO_ICELAND = 13;  //ICELAND
+	NO_ITALY = 14;  //ITALY
+	NO_LATVIA = 15;  //LATVIA
+	NO_LITHUANIA = 16;  //LITHUANIA
+	NO_LUXEMBOURG = 17;  //LUXEMBOURG
+	NO_NETHERLANDS = 18;  //NETHERLANDS
+	NO_NORWAY = 19;  //NORWAY
+	NO_POLAND = 20;  //POLAND
+	NO_PORTUGAL = 21;  //PORTUGAL
+	NO_ROMANIA = 22;  //ROMANIA
+	NO_SLOVAKIA = 23;  //SLOVAKIA
+	NO_SLOVENIA = 24;  //SLOVENIA
+	NO_SPAIN = 25;  //SPAIN
+	NO_TURKEY = 26;  //TURKEY
+	NO_UNITED_KINGDOM = 27;  //UNITED KINGDOM
+	NO_UNITED_STATES_OF_AMERICA = 28;  //UNITED STATES OF AMERICA
+	NO_NATO = 29;  //NATO
+	NO_ARMENIA = 30;  //ARMENIA
+	NO_AUSTRALIA = 31;  //AUSTRALIA
+	NO_AUSTRIA = 32;  //AUSTRIA
+	NO_AZERBAIJAN = 33;  //AZERBAIJAN
+	NO_BELARUS = 34;  //BELARUS
+	NO_BOSNIA_AND_HERZEGOVINA = 35;  //BOSNIA AND HERZEGOVINA
+	NO_FINLAND = 36;  //FINLAND
+	NO_GEORGIA = 37;  //GEORGIA
+	NO_IRELAND = 38;  //IRELAND
+	NO_KAZAKHSTAN = 39;  //KAZAKHSTAN
+	NO_KYRGHYZ_REPUBLIC = 40;  //KYRGHYZ REPUBLIC
+	NO_MALTA = 41;  //MALTA
+	NO_MOLDOVA = 42;  //MOLDOVA
+	NO_MONTENEGRO = 43;  //MONTENEGRO
+	NO_RUSSIA = 44;  //RUSSIA
+	NO_SERBIA = 45;  //SERBIA
+	NO_SWEDEN = 46;  //SWEDEN
+	NO_SWITZERLAND = 47;  //SWITZERLAND
+	NO_TAJIKISTAN = 48;  //TAJIKISTAN
+	NO_THE_FORMER_YUGOSLAV_REPUBLIC_OF_MACEDONIA = 49;  //THE FORMER YUGOSLAV REPUBLIC OF MACEDONIA
+	NO_TURKMENISTAN = 50;  //TURKMENISTAN
+	NO_UKRAINE = 51;  //UKRAINE
+	NO_UZBEKISTAN = 52;  //UZBEKISTAN
+	NO_TA1 = 53;  //TA1
+	NO_TA2 = 54;  //TA2
+	NO_TA3 = 55;  //TA3
+	NO_TA4 = 56;  //TA4
+	NO_TA5 = 57;  //TA5
+	NO_TA6 = 58;  //TA6
+	NO_TA7 = 59;  //TA7
+	NO_TA8 = 60;  //TA8
+	NO_TA9 = 61;  //TA9
+	NO_TA10 = 62;  //TA10
+	NO_TA11 = 63;  //TA11
+	NO_TA12 = 64;  //TA12
+	NO_TA13 = 65;  //TA13
+	NO_TA14 = 66;  //TA14
+	NO_TA15 = 67;  //TA15
+}
+
+
+message ImageCapabilityValue {
+	ImageCapability value = 1;
+}
+
+enum ImageCapability {
+	IC_NOT_USED = 0;  //Not used
+	IC_LIBERTY = 1;  //Liberty
+	IC_GORGON_STARE = 2;  //Gorgon stare
+	IC_VADER = 3;  //VADER
+	IC_DGS = 4;  //DGS
+	IC_JOINT_STARS = 5;  //JOINT STARS
+	IC_OTHER = 6;  //Other
+}
+
+
+message ImagePlaneValue {
+	ImagePlane value = 1;
+}
+
+enum ImagePlane {
+	IP_GROUND = 0;  //Ground
+	IP_SLANT = 1;  //Slant
+}
+
+
+message ImageResolutionValue {
+	ImageResolution value = 1;
+}
+
+enum ImageResolution {
+	IR_UNKNOWN = 0;  //Unknown
+	IR_FULL = 1;  //Full
+	IR_PARTIAL = 2;  //Partial
+}
+
+
+message ImageResponseStatusValue {
+	ImageResponseStatus value = 1;
+}
+
+enum ImageResponseStatus {
+	IRS_ERROR = 0;  //Error
+	IRS_FULL = 1;  //Full
+	IRS_PARTIAL = 2;  //Partial
+	IRS_MODIFIED = 3;  //Modified
+}
+
+
+message ImageryAnalysisTypeValue {
+	ImageryAnalysisType value = 1;
+}
+
+enum ImageryAnalysisType {
+	IAT_UNEXPLOITED = 0;  //Unexploited
+	IAT_EXPLOITED = 1;  //Exploited
+}
+
+
+message ImageryFormatValue {
+	ImageryFormat value = 1;
+}
+
+enum ImageryFormat {
+	IF_BMP = 0;  //BMP
+	IF_GIF = 1;  //GIF
+	IF_TIFF = 2;  //TIFF
+	IF_PNG = 3;  //PNG
+	IF_JPEG = 4;  //JPEG
+	IF_JPEG2000 = 5;  //JPEG2000
+	IF_MPEG1 = 6;  //MPEG1
+	IF_MPEG2 = 7;  //MPEG2
+	IF_MPEG4 = 8;  //MPEG4
+	IF_NTIF10 = 9;  //NTIF10
+	IF_NTIF20 = 10;  //NTIF20
+	IF_NTIF21 = 11;  //NTIF21
+	IF_H264 = 12;  //H264
+}
+
+
+message ImageSourceValue {
+	ImageSource value = 1;
+}
+
+enum ImageSource {
+	IMGSRC_ALL = 0;  //All
+	IMGSRC_NATIONAL = 1;  //National
+	IMGSRC_COMMERCIAL = 2;  //Commercial
+	IMGSRC_TACTICAL = 3;  //Tactical
+}
+
+
+message ImageSystemValue {
+	ImageSystem value = 1;
+}
+
+enum ImageSystem {
+	IST_UNSPECIFIED = 0;  //Unspecified
+	IST_EO = 1;  //EO
+	IST_SAR = 2;  //SAR
+	IST_IR = 3;  //IR
+	IST_THM = 4;  //THM
+}
+
+
+message ImintProductTypeValue {
+	ImintProductType value = 1;
+}
+
+enum ImintProductType {
+	IPT_VIDEO = 0;  //Video
+	IPT_IMAGE = 1;  //Image
+	IPT_TRACK = 2;  //Track
+	IPT_REPORT = 3;  //Report
+	IPT_FILE = 4;  //File
+	IPT_ALL = 5;  //All
+}
+
+
+message IntelligenceReportTypeValue {
+	IntelligenceReportType value = 1;
+}
+
+enum IntelligenceReportType {
+	IRT_OBSERVATION = 0;  //Observation
+	IRT_ENTITY = 1;  //Entity
+	IRT_TACTICAL_GRAPHIC = 2;  //Tactical graphic
+}
+
+
+message IntelligenceSourceValue {
+	IntelligenceSource value = 1;
+}
+
+enum IntelligenceSource {
+	IS_UNKNOWN = 0;  //Unknown
+	IS_AIS = 1;  //AIS
+	IS_COMINT = 2;  //COMINT
+	IS_ELINT = 3;  //ELINT
+	IS_MTI = 4;  //MTI
+	IS_IMINT = 5;  //IMINT
+	IS_LINK16 = 6;  //Link 16
+	IS_IBS = 7;  //IBS
+	IS_ADSB = 8;  //ADSB
+	IS_NFE = 9;  //NFE
+	IS_MFE = 10;  //MFE
+	IS_USER = 11;  //User
+	IS_MINER = 12;  //MINER
+	IS_FUSION_PROCESSOR = 13;  //Fusion processor
+	IS_COMINT_ADVANCED = 14;  //COMINT Advanced
+}
+
+
+message IntelligenceTypeValue {
+	IntelligenceType value = 1;
+}
+
+enum IntelligenceType {
+	IT_SIGINT_ES = 0;  //SIGINT Electronic Support
+	IT_ELINT = 1;  //ELINT
+	IT_COMINT = 2;  //COMINT
+	IT_MASINT = 3;  //MASINT
+	IT_FISINT = 4;  //FISINT
+	IT_SIGINT_Other = 5;  //SIGINT Other
+	IT_MTI = 6;  //MTI - Generic dots in any domain
+	IT_GMTI = 7;  //GMTI - Ground tracks
+	IT_AMTI = 8;  //AMTI - Air tracks
+	IT_SMTI = 9;  //SMTI - Surface tracks derived from radar
+	IT_VMTI = 10;  //VMTI - Video-derived tracks
+	IT_IMINT = 11;  //IMINT
+	IT_IMAGERY = 12;  //Imagery
+	IT_VIDEO = 13;  //Video
+	IT_SAR = 14;  //SAR
+	IT_ACOUSTIC = 15;  //Acoustic
+	IT_TRACKS = 16;  //Tracks
+	IT_PPLI_BFT = 17;  //PPLI BFT
+	IT_AIS = 18;  //AIS
+	IT_ADS_B = 19;  //ADS-B
+	IT_GEOINT = 20;  //GEOINT
+	IT_HUMINT = 21;  //HUMINT
+	IT_HUMINT_TACREP = 22;  //HUMINT TACREP
+	IT_HUMINT_9LINE = 23;  //HUMINT 9LINE
+	IT_HUMINT_KL = 24;  //HUMINT KL
+	IT_COMINT_ADVANCED = 25;  //COMINT Advanced
+}
+
+
+message InterestLevelOfTrackValue {
+	InterestLevelOfTrack value = 1;
+}
+
+enum InterestLevelOfTrack {
+	IL_High = 0;  //High
+	IL_Medium = 1;  //Medium
+	IL_Low = 2;  //Low
+}
+
+
+message InterpretabilityCodeValue {
+	InterpretabilityCode value = 1;
+}
+
+enum InterpretabilityCode {
+	IC_Excellent = 0;  //Excellent
+	IC_Good = 1;  //Good
+	IC_Fair = 2;  //Fair
+	IC_Poor = 3;  //Poor
+}
+
+
+message InterPulseModulationTypeValue {
+	InterPulseModulationType value = 1;
+}
+
+enum InterPulseModulationType {
+	IPMT_Continuous_Wave = 0;  //CW - Continuous Wave
+	IPMT_Pulse_Constant_Stable = 1;  //Pulse Constant Stable - All pulse intervals must match within 1 ??Sec of each other (i.e. ?? 0.5 ??Sec of the average PRI)
+	IPMT_Pulse_Constant_Unstable = 2;  //Pulse Constant Unstable - All pulse intervals must match within 10 ??Sec of each other (i.e. ?? 5 ??Sec of the average PRI)
+	IPMT_Phase_Shift_Keying = 3;  //PSK - Phase Shift Keying
+	IPMT_Jitter_Discrete = 4;  //Jitter, Discrete - Unrecognizable pattern with no more than 10 discrete PIs, and with a total deviation (max PI-min PI) of no more than 150 ??Sec
+	IPMT_Jitter_Random = 5;  //Jitter, Random - Unrecognizable pattern with total deviation (max PI-min PI) no more than 150 ??Sec
+	IPMT_Phase_Shift = 6;  //Phase Shift - All pulse intervals must match to within 4 ??Sec of each other, with the exception of one randomly occurring different pulse interval. The random intervals must also be within 4 ??Sec.
+	IPMT_Undetermined = 7;  //Undetermined - Modulation code has not been measured or is unavailable
+	IPMT_Stagger_2_Pos = 8;  //Stagger - 2 position stagger
+	IPMT_Stagger_3_Pos = 9;  //Stagger - 3 position stagger
+	IPMT_Stagger_4_Pos = 10;  //Stagger - 4 position stagger
+	IPMT_Stagger_5_Pos = 11;  //Stagger - 5 position stagger
+	IPMT_Stagger_6_Pos = 12;  //Stagger - 6 position stagger
+	IPMT_Stagger_7_Pos = 13;  //Stagger - 7 position stagger
+	IPMT_Stagger_8_Pos = 14;  //Stagger - 8 position stagger
+	IPMT_Stagger_9_Pos = 15;  //Stagger - 9 position stagger
+	IPMT_Stagger_10_Pos = 16;  //Stagger - 10 position stagger
+	IPMT_Stagger_11_Pos = 17;  //Stagger - 11 position stagger
+	IPMT_Stagger_12_Pos = 18;  //Stagger - 12 position stagger
+	IPMT_Stagger_13_Pos = 19;  //Stagger - 13 position stagger
+	IPMT_Stagger_14_Pos = 20;  //Stagger - 14 position stagger
+	IPMT_Stagger_15_Pos = 21;  //Stagger - 15 position stagger
+	IPMT_Stagger_16_Pos = 22;  //Stagger - 16 position stagger
+	IPMT_Stagger_17_Pos = 23;  //Stagger - 17 position stagger
+	IPMT_Stagger_18_Pos = 24;  //Stagger - 18 position stagger
+	IPMT_Stagger_19_Pos = 25;  //Stagger - 19 position stagger
+	IPMT_Stagger_20_Pos = 26;  //Stagger - 20 position stagger
+	IPMT_Stagger_21_Pos = 27;  //Stagger - 21 position stagger
+	IPMT_Stagger_22_Pos = 28;  //Stagger - 22 position stagger
+	IPMT_Stagger_23_Pos = 29;  //Stagger - 23 position stagger
+	IPMT_Stagger_24_Pos = 30;  //Stagger - 24 position stagger
+	IPMT_Stagger_25_Pos = 31;  //Stagger - 25 position stagger
+	IPMT_Stagger_26_Pos = 32;  //Stagger - 26 position stagger
+	IPMT_Stagger_27_Pos = 33;  //Stagger - 27 position stagger
+	IPMT_Stagger_28_Pos = 34;  //Stagger - 28 position stagger
+	IPMT_Stagger_29_Pos = 35;  //Stagger - 29 position stagger
+	IPMT_Stagger_30_Pos = 36;  //Stagger - 30 position stagger
+	IPMT_Stagger_31_Pos = 37;  //Stagger - 31 position stagger
+	IPMT_Stagger_32_Pos = 38;  //Stagger - 32 position stagger
+	IPMT_Stagger_33_Pos = 39;  //Stagger - 33 position stagger
+	IPMT_Stagger_34_Pos = 40;  //Stagger - 34 position stagger
+	IPMT_Stagger_35_Pos = 41;  //Stagger - 35 position stagger
+	IPMT_Stagger_36_Pos = 42;  //Stagger - 36 position stagger
+	IPMT_Stagger_37_Pos = 43;  //Stagger - 37 position stagger
+	IPMT_Stagger_38_Pos = 44;  //Stagger - 38 position stagger
+	IPMT_Stagger_39_Pos = 45;  //Stagger - 39 position stagger
+	IPMT_Stagger_40_Pos = 46;  //Stagger - 40 position stagger
+	IPMT_Stagger_41_Pos = 47;  //Stagger - 41 position stagger
+	IPMT_Stagger_42_Pos = 48;  //Stagger - 42 position stagger
+	IPMT_Stagger_43_Pos = 49;  //Stagger - 43 position stagger
+	IPMT_Stagger_44_Pos = 50;  //Stagger - 44 position stagger
+	IPMT_Stagger_45_Pos = 51;  //Stagger - 45 position stagger
+	IPMT_Stagger_46_Pos = 52;  //Stagger - 46 position stagger
+	IPMT_Stagger_47_Pos = 53;  //Stagger - 47 position stagger
+	IPMT_Stagger_48_Pos = 54;  //Stagger - 48 position stagger
+	IPMT_Stagger_49_Pos = 55;  //Stagger - 49 position stagger
+	IPMT_Stagger_50_Pos = 56;  //Stagger - 50 position stagger
+	IPMT_Complex_Large = 57;  //Complex, Large - A Large Complex PRI contains no pulse intervals < 50 ??Sec
+	IPMT_Complex_Small = 58;  //Complex, Small - A Small Complex PRI contains at least one pulse interval < 50 ??Sec
+	IPMT_Staircase_3_Pulse_Interval_Per_Step = 59;  //Staircase - 3 pulse intervals per step.  The number of signature PRIs (different steps) does not affect the modulation code
+	IPMT_Staircase_4_Pulse_Interval_Per_Step = 60;  //Staircase - 4 pulse intervals per step
+	IPMT_Staircase_5_Pulse_Interval_Per_Step = 61;  //Staircase - 5 pulse intervals per step
+	IPMT_Staircase_6_Pulse_Interval_Per_Step = 62;  //Staircase - 6 pulse intervals per step
+	IPMT_Staircase_7_Pulse_Interval_Per_Step = 63;  //Staircase - 7 pulse intervals per step
+	IPMT_Staircase_8_Pulse_Interval_Per_Step = 64;  //Staircase - 8 pulse intervals per step
+	IPMT_Staircase_9_Pulse_Interval_Per_Step = 65;  //Staircase - 9 pulse intervals per step
+	IPMT_Staircase_10_Pulse_Interval_Per_Step = 66;  //Staircase - 10 pulse intervals per step
+	IPMT_Staircase_11_Pulse_Interval_Per_Step = 67;  //Staircase - 11 pulse intervals per step
+	IPMT_Staircase_12_Pulse_Interval_Per_Step = 68;  //Staircase - 12 pulse intervals per step
+	IPMT_Staircase_13_Pulse_Interval_Per_Step = 69;  //Staircase - 13 pulse intervals per step
+	IPMT_Staircase_14_Pulse_Interval_Per_Step = 70;  //Staircase - 14 pulse intervals per step
+	IPMT_Staircase_15_Pulse_Interval_Per_Step = 71;  //Staircase - 15 pulse intervals per step
+	IPMT_Staircase_16_Pulse_Interval_Per_Step = 72;  //Staircase - 16 pulse intervals per step
+	IPMT_Staircase_17_Pulse_Interval_Per_Step = 73;  //Staircase - 17 pulse intervals per step
+	IPMT_Staircase_18_Pulse_Interval_Per_Step = 74;  //Staircase - 18 pulse intervals per step
+	IPMT_Staircase_19_Pulse_Interval_Per_Step = 75;  //Staircase - 19 pulse intervals per step
+	IPMT_Staircase_20_Pulse_Interval_Per_Step = 76;  //Staircase - 20 pulse intervals per step
+	IPMT_Staircase_21_Pulse_Interval_Per_Step = 77;  //Staircase - 21 pulse intervals per step
+	IPMT_Pulse_Group_Triplet_Stable = 78;  //Pulse Group - Triplet ??? Stable
+	IPMT_Pulse_Group_Triplet_Unstable = 79;  //Pulse Group - Triplet ??? Unstable
+	IPMT_Pulse_Group_Quadruplet_Stable = 80;  //Pulse Group - Quadruplet ??? Stable
+	IPMT_Pulse_Group_Quadruplet_Unstable = 81;  //Pulse Group - Quadruplet ??? Unstable
+	IPMT_Pulse_Group_Quintuplet_Stable = 82;  //Pulse Group - Quintuplet ??? Stable
+	IPMT_Pulse_Group_Quintuplet_Unstable = 83;  //Pulse Group - Quintuplet ??? Unstable
+	IPMT_Pulse_Group_Sextuplet_Stable = 84;  //Pulse Group - Sextuplet ??? Stable
+	IPMT_Pulse_Group_Sextuplet_Unstable = 85;  //Pulse Group - Sextuplet ??? Unstable
+	IPMT_Pulse_Doublet_Doublet_Unstable = 86;  //Pulse Doublet - Doublet ??? Unstable
+	IPMT_Pulse_Doublet_Constant_Frame_Constant_Doublet_Interval = 87;  //Pulse Doublet - Constant frame interval, Constant doublet interval
+	IPMT_Pulse_Doublet_Constant_Frame_2_Pos_Doublet_Stagger = 88;  //Pulse Doublet - Constant frame interval, 2 position stagger on doublets
+	IPMT_Pulse_Doublet_Constant_Frame_3_Pos_Doublet_Stagger = 89;  //Pulse Doublet - Constant frame interval, 3 position stagger on doublets
+	IPMT_Pulse_Doublet_Constant_Frame_4_Pos_Doublet_Stagger = 90;  //Pulse Doublet - Constant frame interval, 4 position stagger on doublets
+	IPMT_Pulse_Doublet_Constant_Frame_5_Pos_Doublet_Stagger = 91;  //Pulse Doublet - Constant frame interval, 5 position stagger on doublets
+	IPMT_Pulse_Doublet_Constant_Frame_6_Pos_Doublet_Stagger = 92;  //Pulse Doublet - Constant frame interval, 6 position stagger on doublets
+	IPMT_Pulse_Doublet_Constant_Frame_7_Pos_Doublet_Stagger = 93;  //Pulse Doublet - Constant frame interval, 7 position stagger on doublets
+	IPMT_Pulse_Doublet_2_Pos_Frame_Stagger_Constant_Doublet_Interval = 94;  //Pulse Doublet - 2 position stagger on frame, Constant doublet interval
+	IPMT_Pulse_Doublet_2_Pos_Frame_Stagger_2_Pos_Doublet_Stagger = 95;  //Pulse Doublet - 2 position stagger on frame, 2 position stagger on doublets
+	IPMT_Pulse_Doublet_2_Pos_Frame_Stagger_3_Pos_Doublet_Stagger = 96;  //Pulse Doublet - 2 position stagger on frame, 3 position stagger on doublets
+	IPMT_Pulse_Doublet_2_Pos_Frame_Stagger_4_Pos_Doublet_Stagger = 97;  //Pulse Doublet - 2 position stagger on frame, 4 position stagger on doublets
+	IPMT_Pulse_Doublet_2_Pos_Frame_Stagger_5_Pos_Doublet_Stagger = 98;  //Pulse Doublet - 2 position stagger on frame, 5 position stagger on doublets
+	IPMT_Pulse_Doublet_2_Pos_Frame_Stagger_6_Pos_Doublet_Stagger = 99;  //Pulse Doublet - 2 position stagger on frame, 6 position stagger on doublets
+	IPMT_Pulse_Doublet_2_Pos_Frame_Stagger_7_Pos_Doublet_Stagger = 100;  //Pulse Doublet - 2 position stagger on frame, 7 position stagger on doublets
+	IPMT_Pulse_Doublet_3_Pos_Frame_Stagger_Constant_Doublet_Interval = 101;  //Pulse Doublet - 3 position stagger on frame, Constant doublet interval
+	IPMT_Pulse_Doublet_3_Pos_Frame_Stagger_2_Pos_Doublet_Stagger = 102;  //Pulse Doublet - 3 position stagger on frame, 2 position stagger on doublets
+	IPMT_Pulse_Doublet_3_Pos_Frame_Stagger_3_Pos_Doublet_Stagger = 103;  //Pulse Doublet - 3 position stagger on frame, 3 position stagger on doublets
+	IPMT_Pulse_Doublet_3_Pos_Frame_Stagger_4_Pos_Doublet_Stagger = 104;  //Pulse Doublet - 3 position stagger on frame, 4 position stagger on doublets
+	IPMT_Pulse_Doublet_3_Pos_Frame_Stagger_5_Pos_Doublet_Stagger = 105;  //Pulse Doublet - 3 position stagger on frame, 5 position stagger on doublets
+	IPMT_Pulse_Doublet_3_Pos_Frame_Stagger_6_Pos_Doublet_Stagger = 106;  //Pulse Doublet - 3 position stagger on frame, 6 position stagger on doublets
+	IPMT_Pulse_Doublet_3_Pos_Frame_Stagger_7_Pos_Doublet_Stagger = 107;  //Pulse Doublet - 3 position stagger on frame, 7 position stagger on doublets
+	IPMT_Pulse_Doublet_4_Pos_Frame_Stagger_Constant_Doublet_Interval = 108;  //Pulse Doublet - 4 position stagger on frame, Constant doublet interval
+	IPMT_Pulse_Doublet_4_Pos_Frame_Stagger_2_Pos_Doublet_Stagger = 109;  //Pulse Doublet - 4 position stagger on frame, 2 position stagger on doublets
+	IPMT_Pulse_Doublet_4_Pos_Frame_Stagger_3_Pos_Doublet_Stagger = 110;  //Pulse Doublet - 4 position stagger on frame, 3 position stagger on doublets
+	IPMT_Pulse_Doublet_4_Pos_Frame_Stagger_4_Pos_Doublet_Stagger = 111;  //Pulse Doublet - 4 position stagger on frame, 4 position stagger on doublets
+	IPMT_Pulse_Doublet_4_Pos_Frame_Stagger_5_Pos_Doublet_Stagger = 112;  //Pulse Doublet - 4 position stagger on frame, 5 position stagger on doublets
+	IPMT_Pulse_Doublet_4_Pos_Frame_Stagger_6_Pos_Doublet_Stagger = 113;  //Pulse Doublet - 4 position stagger on frame, 6 position stagger on doublets
+	IPMT_Pulse_Doublet_4_Pos_Frame_Stagger_7_Pos_Doublet_Stagger = 114;  //Pulse Doublet - 4 position stagger on frame, 7 position stagger on doublets
+	IPMT_Pulse_Doublet_5_Pos_Frame_Stagger_Constant_Doublet_Interval = 115;  //Pulse Doublet - 5 position stagger on frame, Constant doublet interval
+	IPMT_Pulse_Doublet_5_Pos_Frame_Stagger_2_Pos_Doublet_Stagger = 116;  //Pulse Doublet - 5 position stagger on frame, 2 position stagger on doublets
+	IPMT_Pulse_Doublet_5_Pos_Frame_Stagger_3_Pos_Doublet_Stagger = 117;  //Pulse Doublet - 5 position stagger on frame, 3 position stagger on doublets
+	IPMT_Pulse_Doublet_5_Pos_Frame_Stagger_4_Pos_Doublet_Stagger = 118;  //Pulse Doublet - 5 position stagger on frame, 4 position stagger on doublets
+	IPMT_Pulse_Doublet_5_Pos_Frame_Stagger_5_Pos_Doublet_Stagger = 119;  //Pulse Doublet - 5 position stagger on frame, 5 position stagger on doublets
+	IPMT_Pulse_Doublet_5_Pos_Frame_Stagger_6_Pos_Doublet_Stagger = 120;  //Pulse Doublet - 5 position stagger on frame, 6 position stagger on doublets
+	IPMT_Pulse_Doublet_5_Pos_Frame_Stagger_7_Pos_Doublet_Stagger = 121;  //Pulse Doublet - 5 position stagger on frame, 7 position stagger on doublets
+	IPMT_Pulse_Doublet_6_Pos_Frame_Stagger_Constant_Doublet_Interval = 122;  //Pulse Doublet - 6 position stagger on frame, Constant doublet interval
+	IPMT_Pulse_Doublet_6_Pos_Frame_Stagger_2_Pos_Doublet_Stagger = 123;  //Pulse Doublet - 6 position stagger on frame, 2 position stagger on doublets
+	IPMT_Pulse_Doublet_6_Pos_Frame_Stagger_3_Pos_Doublet_Stagger = 124;  //Pulse Doublet - 6 position stagger on frame, 3 position stagger on doublets
+	IPMT_Pulse_Doublet_6_Pos_Frame_Stagger_4_Pos_Doublet_Stagger = 125;  //Pulse Doublet - 6 position stagger on frame, 4 position stagger on doublets
+	IPMT_Pulse_Doublet_6_Pos_Frame_Stagger_5_Pos_Doublet_Stagger = 126;  //Pulse Doublet - 6 position stagger on frame, 5 position stagger on doublets
+	IPMT_Pulse_Doublet_6_Pos_Frame_Stagger_6_Pos_Doublet_Stagger = 127;  //Pulse Doublet - 6 position stagger on frame, 6 position stagger on doublets
+	IPMT_Pulse_Doublet_6_Pos_Frame_Stagger_7_Pos_Doublet_Stagger = 128;  //Pulse Doublet - 6 position stagger on frame, 7 position stagger on doublets
+	IPMT_Pulse_Doublet_7_Pos_Frame_Stagger_Constant_Doublet_Interval = 129;  //Pulse Doublet - 7 position stagger on frame, Constant doublet interval
+	IPMT_Pulse_Doublet_7_Pos_Frame_Stagger_2_Pos_Doublet_Stagger = 130;  //Pulse Doublet - 7 position stagger on frame, 2 position stagger on doublets
+	IPMT_Pulse_Doublet_7_Pos_Frame_Stagger_3_Pos_Doublet_Stagger = 131;  //Pulse Doublet - 7 position stagger on frame, 3 position stagger on doublets
+	IPMT_Pulse_Doublet_7_Pos_Frame_Stagger_4_Pos_Doublet_Stagger = 132;  //Pulse Doublet - 7 position stagger on frame, 4 position stagger on doublets
+	IPMT_Pulse_Doublet_7_Pos_Frame_Stagger_5_Pos_Doublet_Stagger = 133;  //Pulse Doublet - 7 position stagger on frame, 5 position stagger on doublets
+	IPMT_Pulse_Doublet_7_Pos_Frame_Stagger_6_Pos_Doublet_Stagger = 134;  //Pulse Doublet - 7 position stagger on frame, 6 position stagger on doublets
+	IPMT_Pulse_Doublet_7_Pos_Frame_Stagger_7_Pos_Doublet_Stagger = 135;  //Pulse Doublet - 7 position stagger on frame, 7 position stagger on doublets
+	IPMT_Pulse_Doublet_8_Pos_Frame_Stagger_Constant_Doublet_Interval = 136;  //Pulse Doublet - 8 position stagger on frame, Constant doublet interval
+	IPMT_Pulse_Doublet_8_Pos_Frame_Stagger_2_Pos_Doublet_Stagger = 137;  //Pulse Doublet - 8 position stagger on frame, 2 position stagger on doublets
+	IPMT_Pulse_Doublet_8_Pos_Frame_Stagger_3_Pos_Doublet_Stagger = 138;  //Pulse Doublet - 8 position stagger on frame, 3 position stagger on doublets
+	IPMT_Pulse_Doublet_8_Pos_Frame_Stagger_4_Pos_Doublet_Stagger = 139;  //Pulse Doublet - 8 position stagger on frame, 4 position stagger on doublets
+	IPMT_Pulse_Doublet_8_Pos_Frame_Stagger_5_Pos_Doublet_Stagger = 140;  //Pulse Doublet - 8 position stagger on frame, 5 position stagger on doublets
+	IPMT_Pulse_Doublet_8_Pos_Frame_Stagger_6_Pos_Doublet_Stagger = 141;  //Pulse Doublet - 8 position stagger on frame, 6 position stagger on doublets
+}
+
+
+message Link16MessageTypeValue {
+	Link16MessageType value = 1;
+}
+
+enum Link16MessageType {
+	LMT_J2_0 = 0;  //Indirect Interface Unit PPLI
+	LMT_J2_2 = 1;  //Air PPLI
+	LMT_J2_3 = 2;  //Surface PPLI
+	LMT_J2_4 = 3;  //Subsurface PPLI
+	LMT_J2_5 = 4;  //Land Point PPLI
+	LMT_J2_6 = 5;  //Land Track PPLI
+	LMT_J3_0 = 6;  //Reference Point
+	LMT_J3_1 = 7;  //Emergency Point
+	LMT_J3_2 = 8;  //Air Track
+	LMT_J3_3 = 9;  //Surface Track
+	LMT_J3_4 = 10;  //Subsurface Track
+	LMT_J3_5 = 11;  //Land Point/Track
+	LMT_J3_6 = 12;  //Space Track
+	LMT_J3_7 = 13;  //EW Product Information
+	LMT_J5_4 = 14;  //Acoustic Brng/Range
+	LMT_J6_0 = 15;  //Amplification
+	LMT_J7_0 = 16;  //Track Management
+	LMT_J7_1 = 17;  //Data Update Request
+	LMT_J7_2 = 18;  //Correlation
+	LMT_J7_3 = 19;  //Pointer
+	LMT_J7_4 = 20;  //Track Identifier
+	LMT_J7_5 = 21;  //IFF/SIF Management
+	LMT_J7_6 = 22;  //Filter Management
+	LMT_J7_7 = 23;  //Association
+	LMT_J8_0 = 24;  //Unit Designator
+	LMT_J8_1 = 25;  //Mission Correlator Change
+	LMT_J9_0 = 26;  //Command
+	LMT_J9_1 = 27;  //Engagement Coordination
+	LMT_J10_2 = 28;  //Engagement Status
+	LMT_J10_3 = 29;  //Handover
+	LMT_J10_5 = 30;  //Controlling Unit Report
+	LMT_J10_6 = 31;  //Pairing
+	LMT_J12_0 = 32;  //Mission Assignment
+	LMT_J12_1 = 33;  //Vector
+	LMT_J12_2 = 34;  //Precise Aircraft Direction
+	LMT_J12_3 = 35;  //Flight Path
+	LMT_J12_4 = 36;  //Controlling Unit Change
+	LMT_J12_5 = 37;  //Target/Track Correlation
+	LMT_J12_6 = 38;  //Target Sorting
+	LMT_J12_7 = 39;  //Target Bearing
+	LMT_J13_0 = 40;  //Airfield Status
+	LMT_J13_2 = 41;  //Air Platform and System Status
+	LMT_J13_3 = 42;  //Surface Platform and System Status
+	LMT_J13_4 = 43;  //Subsurface Platform and System Status
+	LMT_J13_5 = 44;  //Land Platform and System Status
+	LMT_J14_0 = 45;  //Parametric Information
+	LMT_J14_2 = 46;  //EW Control/Coordination
+	LMT_J15_0 = 47;  //Threat Warning
+	LMT_J16_0 = 48;  //Imagery
+	LMT_J16_1 = 49;  //Route Change
+	LMT_J17_0 = 50;  //Weather Over Target
+	LMT_J28_0 = 51;  //US National 1 (Army)
+	LMT_J28_1 = 52;  //US National 2 (Navy)
+	LMT_J28_2 = 53;  //US National 3  (Air Force)
+	LMT_J28_3 = 54;  //US National 4 (Marines)
+	LMT_J28_6 = 55;  //US Nat???l 5 (NSA)(TIBS)
+	LMT_J29_1 = 56;  //UK Nation Use
+	LMT_J30_0 = 57;  //National Use (Reserved)
+	LMT_J31_0 = 58;  //Over-the-Air Rekeying Management Message
+	LMT_J31_1 = 59;  //Over-the-Air Rekeying  Message
+	LMT_J31_7 = 60;  //No Statement
+}
+
+
+message LinkStatusValue {
+	LinkStatus value = 1;
+}
+
+enum LinkStatus {
+	LS_NOT_REPORTING = 0;  //Not reporting
+	LS_REPORTING = 1;  //Reporting
+}
+
+
+message LocationSourceValue {
+	LocationSource value = 1;
+}
+
+enum LocationSource {
+	LS_PrecisionPhoto = 0;  //Precision photo
+	LS_Mensuration = 1;  //Mensuration
+	LS_Unknown = 2;  //Unknown
+	LS_ChangeDetection = 3;  //Change Detection
+	LS_MIDB = 4;  //MIDB
+	LS_IA = 5;  //IA
+}
+
+
+message NativeIdTypeValue {
+	NativeIdType value = 1;
+}
+
+enum NativeIdType {
+	NIT_None = 0;  //None
+	NIT_AIS_MMSI = 1;  //AIS MMSI
+	NIT_Link16_TN = 2;  //Link 16 TN
+	NIT_IBS_TN = 3;  //IBS TN
+	NIT_Other = 4;  //Other
+}
+
+
+message NcctMessageTypeValue {
+	NcctMessageType value = 1;
+}
+
+enum NcctMessageType {
+	NMST_Unknown = 0;  //Unknown
+	NMST_NncConnectionTable = 1;  //NncConnectionTable
+	NMST_NncDataRepositoryFingerprint = 2;  //NncDataRepositoryFingerprint
+	NMST_NncDataRepositoryRequest = 3;  //NncDataRepositoryRequest
+	NMST_NncLocalSubscription = 4;  //NncLocalSubscription
+	NMST_SubscriptionFilter = 5;  //SubscriptionFilter
+	NMST_Logger = 6;  //Logger
+	NMST_SegmentRequest = 7;  //SegmentRequest
+	NMST_ImageRequest = 8;  //ImageRequest
+	NMST_ImageData = 9;  //ImageData
+	NMST_Subscription = 101;  //Subscription
+	NMST_IcdRequest = 102;  //IcdRequest
+	NMST_Delete = 103;  //Delete
+	NMST_ExtendedInformation = 104;  //ExtendedInformation
+	NMST_Advisory = 105;  //Advisory
+	NMST_NetworkStatus = 106;  //NetworkStatus
+	NMST_PingInitiate = 107;  //PingInitiate
+	NMST_PingResponse = 108;  //PingResponse
+	NMST_NcctConnection = 109;  //NcctConnection
+	NMST_ConnectionInformation = 110;  //ConnectionInformation
+	NMST_RuleOfInteraction = 201;  //RuleOfInteraction
+	NMST_TargetDefinition = 202;  //TargetDefinition
+	NMST_Task = 203;  //Task
+	NMST_TaskState = 204;  //TaskState
+	NMST_TaskResponse = 205;  //TaskResponse
+	NMST_NamedAreaOfInterest = 301;  //NamedAreaOfInterest
+	NMST_PlatformConfiguration = 302;  //PlatformConfiguration
+	NMST_PlatformPosition = 303;  //PlatformPosition
+	NMST_EntityReport = 304;  //EntityReport
+	NMST_NcctIdInterestLevel = 305;  //NcctIdInterestLevel
+	NMST_GenericPayload = 401;  //GenericPayload
+	NMST_SensorMeasurementAdjustment = 501;  //SensorMeasurementAdjustment
+	NMST_DataAmplification = 502;  //DataAmplification
+	NMST_Association = 503;  //Association
+	NMST_Relationship = 504;  //Relationship
+	NMST_Chat = 505;  //Chat
+	NMST_DataLinkReportTask = 601;  //DataLinkReportTask
+	NMST_Nomination = 602;  //Nomination
+	NMST_DataLinkReportStatus = 603;  //DataLinkReportStatus
+}
+
+
+message NodeTypeValue {
+	NodeType value = 1;
+}
+
+enum NodeType {
+	NT_NOT_USED = 0;  //Not Used
+	NT_NNC = 1;  //NCCT Network Controller (NNC)
+	NT_PIM = 2;  //Platform Interface Module (PIM)
+	NT_UI = 3;  //User Interface (UI)
+	NT_Fusion = 4;  //Fusion Engine (FE)
+	NT_Fusion_PIM = 5;  //Fusion Engine PIM (FEP)
+}
+
+
+message NominationTypeValue {
+	NominationType value = 1;
+}
+
+enum NominationType {
+	NOMT_NOMINATE_GCCS = 0;  //Nominate GCCS
+	NOMT_NOMINATE_JADOCS = 1;  //Nominate JADOCS
+}
+
+
+message OperatingEnvironmentValue {
+	OperatingEnvironment value = 1;
+}
+
+enum OperatingEnvironment {
+	OE_IN_THEATER_OP = 0;  //In theater operational data
+	OE_EXERCISE = 1;  //Exercise
+	OE_TEST = 2;  //Test
+}
+
+
+message OperatorFunctionValue {
+	OperatorFunction value = 1;
+}
+
+enum OperatorFunction {
+	OF_None = 0;  //None
+	OF_Analyze = 1;  //Analyze
+	OF_Collect = 2;  //Collect
+	OF_Contribute = 3;  //Contribute
+	OF_Designate = 4;  //Designate
+	OF_Nominate = 5;  //Nominate
+	OF_Plan = 6;  //Plan
+	OF_Report = 7;  //Report
+	OF_TNG = 8;  //TNG
+	OF_Image = 9;  //Image
+}
+
+
+message PersonnelInvolvedValue {
+	PersonnelInvolved value = 1;
+}
+
+enum PersonnelInvolved {
+	PI_UNKNOWN = 0;  //UNKNOWN
+	PI_1_PERSONNEL_INVOLVED = 1;  //1 PERSONNEL INVOLVED
+	PI_2_PERSONNEL_INVOLVED = 2;  //2 PERSONNEL INVOLVED
+	PI_3_PERSONNEL_INVOLVED = 3;  //3 PERSONNEL INVOLVED
+	PI_4_PERSONNEL_INVOLVED = 4;  //4 PERSONNEL INVOLVED
+	PI_5_PERSONNEL_INVOLVED = 5;  //5 PERSONNEL INVOLVED
+	PI_6_PERSONNEL_INVOLVED = 6;  //6 PERSONNEL INVOLVED
+	PI_7_PERSONNEL_INVOLVED = 7;  //7 PERSONNEL INVOLVED
+	PI_8_PERSONNEL_INVOLVED = 8;  //8 PERSONNEL INVOLVED
+	PI_9_PERSONNEL_INVOLVED = 9;  //9 PERSONNEL INVOLVED
+	PI_10_PERSONNEL_INVOLVED = 10;  //10 PERSONNEL INVOLVED
+	PI_11_PERSONNEL_INVOLVED = 11;  //11 PERSONNEL INVOLVED
+	PI_12_PERSONNEL_INVOLVED = 12;  //12 PERSONNEL INVOLVED
+	PI_FEW__2_THROUGH_7__PERSONNEL_INVOLVED = 13;  //Few (2-7 personnel involved)
+	PI_MANY___7_AND___OR___TO_12__PERSONNEL_INVOLVED = 14;  //Many (7 to 12 personnel involved)
+	PI_GREATER_THAN_12_PERSONNEL_INVOLVED = 15;  //Greater than 12 personnel involved
+}
+
+
+message PlatformActionValue {
+	PlatformAction value = 1;
+}
+
+enum PlatformAction {
+	PA_CAN_NOT_PERFORM = 0;  //Cannot Perform
+	PA_WILL_PERFORM = 1;  //Will Perform
+	PA_DELAY_PERFORM = 2;  //Delay Perform
+	PA_COMPLETED_NO_DATA = 3;  //Completed no data
+	PA_COMPLETED_DATA = 4;  //Completed data
+}
+
+
+message PlatformAmplificationTypeValue {
+	PlatformAmplificationType value = 1;
+}
+
+enum PlatformAmplificationType {
+	PAT_UNKNOWN = 0;  //UNKNOWN
+	PAT_UNITARY_HIGH_EXPLOSIVE_WARHEAD = 1;  //UNITARY HIGH EXPLOSIVE WARHEAD
+	PAT_NUCLEAR_WARHEAD = 2;  //NUCLEAR WARHEAD
+	PAT_BULK_CHEMICAL_WARHEAD = 3;  //BULK CHEMICAL WARHEAD
+	PAT_BULK_BIOLOGICAL_WARHEAD = 4;  //BULK BIOLOGICAL WARHEAD
+	PAT_FUEL_AIR_EXPLOSIVE_WARHEAD = 5;  //FUEL AIR EXPLOSIVE WARHEAD
+	PAT_DEBRIS = 6;  //DEBRIS
+	PAT_WARHEAD = 7;  //WARHEAD
+	PAT_PENETRATION_AID = 8;  //PENETRATION AID
+	PAT_HIGH_EXPLOSIVE_SUBMUNITION_WARHEAD = 9;  //HIGH EXPLOSIVE SUBMUNITION WARHEAD
+	PAT_CHEMICAL_SUBMUNITION_WARHEAD = 10;  //CHEMICAL SUBMUNITION WARHEAD
+	PAT_BIOLOGICAL_SUBMUNITION_WARHEAD = 11;  //BIOLOGICAL SUBMUNITION WARHEAD
+	PAT_BOOSTER_TANK = 12;  //BOOSTER TANK
+	PAT_SPACE_ACM = 13;  //SPACE ACM
+	PAT_COMBINED_ATTITUDE_CONTROL_MODULE_AND_WARHEAD__CAR_ = 14;  //COMBINED ATTITUDE CONTROL MODULE AND WARHEAD
+	PAT_SINGLE_BODY_TARGET = 15;  //SINGLE BODY TARGET
+	PAT_DECOY_BALLOON = 16;  //DECOY BALLOON
+	PAT_CHAFF = 17;  //CHAFF
+	PAT_POST_BOOST_VEHICLE__PBV_ = 18;  //POST BOOST VEHICLE
+	PAT_LIGHTWEIGHT_REPLICA__LREP__DECOY = 19;  //LIGHTWEIGHT REPLICA DECOY
+	PAT_KILL_VEHICLE = 20;  //KILL VEHICLE
+	PAT_JAMMER = 21;  //JAMMER
+	PAT_HIGH_BETA_DECOY = 22;  //HIGH BETA DECOY
+	PAT_FAMILY_TRACK = 23;  //FAMILY TRACK
+}
+
+
+message ProvenanceSourceTypeValue {
+	ProvenanceSourceType value = 1;
+}
+
+enum ProvenanceSourceType {
+	PST_None = 0;  //None
+	PST_Other = 1;  //Other
+	PST_Operator = 2;  //Operator
+	PST_Link16 = 3;  //Link 16
+	PST_MFE = 4;  //MFE
+	PST_NFE = 5;  //NFE
+	PST_MINER = 6;  //MINER
+	PST_NcctParticipant = 7;  //Ncct Participant
+	PST_ElintJICD = 8;  //Elint JICD
+	PST_TargetDefinition = 9;  //Target Definition
+	PST_ComintJICD = 10;  //Comint JICD
+	PST_FUSION_PROCESSOR = 11;  //FUSION_PROCESSOR
+}
+
+
+message ReferencePointAreaTypeValue {
+	ReferencePointAreaType value = 1;
+}
+
+enum ReferencePointAreaType {
+	RPAT_UNKNOWN = 0;  //UNKNOWN
+	RPAT_NAVIGATION = 1;  //NAVIGATION
+	RPAT_MINE = 2;  //MINE
+	RPAT_IMPACT_POINT = 3;  //IMPACT POINT
+	RPAT_GROUND_ZERO = 4;  //GROUND ZERO
+	RPAT_AIM_WEAPON_ENTRY_POINT = 5;  //AIM/WEAPON ENTRY POINT
+	RPAT_MISSILE_LAUNCH_POINT = 6;  //MISSILE LAUNCH POINT
+	RPAT_ELECTRONIC_ATTACK__EA__DECOY = 7;  //ELECTRONIC ATTACK DECOY
+	RPAT_ENGAGEMENT_POINT = 8;  //ENGAGEMENT POINT
+	RPAT_OIL_RIG = 9;  //OIL RIG
+	RPAT_MARSHALL_POINT = 10;  //MARSHALL POINT
+	RPAT_WAYPOINT = 11;  //WAYPOINT
+	RPAT_CORRIDOR_TAB = 12;  //CORRIDOR TAB
+	RPAT_POSITION_AND_INTENDED_MOVEMENT__PIM_ = 13;  //POSITION AND INTENDED MOVEMENT PIM
+	RPAT_DISPOSITION_CENTER = 14;  //DISPOSITION CENTER
+	RPAT_FORMATION_CENTER = 15;  //FORMATION CENTER
+	RPAT_SEARCH_AREA = 16;  //SEARCH AREA
+	RPAT_VICTOR_LIMA__VL_ = 17;  //VICTOR LIMA
+	RPAT_SUBMARINE_POSITION_AND_INTENDED_MOVEMENT__SIM_ = 18;  //SUBMARINE POSITION AND INTENDED MOVEMENT
+	RPAT_DEFENDED_ASSET = 19;  //DEFENDED ASSET
+	RPAT_TOMCAT = 20;  //TOMCAT
+	RPAT_PICKET = 21;  //PICKET
+	RPAT_RENDEZVOUS = 22;  //RENDEZVOUS
+	RPAT_GENERAL_REPLENISHMENT = 23;  //GENERAL REPLENISHMENT
+	RPAT_RESCUE = 24;  //RESCUE
+	RPAT_COMBAT_AIR_PATROL__CAP_ = 25;  //COMBAT AIR PATROL
+	RPAT_AIRBORNE_EARLY_WARNING__AEW_ = 26;  //AIRBORNE EARLY WARNING
+	RPAT_ANTISUBMARINE_WARFARE__ASW__FIXED_WING = 27;  //ANTISUBMARINE WARFARE FIXED WING
+	RPAT_ANTISUBMARINE_WARFARE__ASW__HELICOPTOR__HELO_ = 28;  //ANTISUBMARINE WARFARE HELICOPTOR
+	RPAT_AIR_REPLENISHMENT = 29;  //AIR REPLENISHMENT
+	RPAT_STRIKE_INITIAL_POINT__IP_ = 30;  //STRIKE INITIAL POINT
+	RPAT_TACAN = 31;  //TACAN
+	RPAT_TANKER = 32;  //TANKER
+	RPAT_ORBIT__RACE_TRACK = 33;  //ORBIT, RACE TRACK
+	RPAT_ORBIT__FIGURE_EIGHT = 34;  //ORBIT, FIGURE EIGHT
+	RPAT_ORBIT__RANDOM_CLOSED = 35;  //ORBIT, RANDOM CLOSED
+	RPAT_ORBIT__POINT = 36;  //ORBIT, POINT
+	RPAT_FORWARD_EDGE_OF_THE_BATTLE_AREA = 37;  //FORWARD EDGE OF THE BATTLE AREA
+	RPAT_GUN_TARGET_LINE = 38;  //GUN TARGET LINE
+	RPAT_CORRIDOR = 39;  //CORRIDOR
+	RPAT_HOSTILE_BOUNDARY = 40;  //HOSTILE BOUNDARY
+	RPAT_BUFFER_ZONE_BOUNDARY = 41;  //BUFFER ZONE BOUNDARY
+	RPAT_LOW_LEVEL_TRANSIT_ROUTE = 42;  //LOW LEVEL TRANSIT ROUTE
+	RPAT_TACTICAL_ACTION_LINE = 43;  //TACTICAL ACTION LINE
+	RPAT_FIRE_SUPPORT_COORDINATION_LINE__FSCL_ = 44;  //FIRE SUPPORT COORDINATION LINE
+	RPAT_FORWARD_LINE_OF_OWN_TROOPS__FLOT_ = 45;  //FORWARD LINE OF OWN TROOPS
+	RPAT_SEARCH = 46;  //SEARCH
+	RPAT_RESTRICTED = 47;  //RESTRICTED
+	RPAT_EXERCISE = 48;  //EXERCISE
+	RPAT_SUBMARINE_PATROL_AREA = 49;  //SUBMARINE PATROL AREA
+	RPAT_FIGHTER_ENGAGEMENT_ZONE_FIGHTER_AOR = 50;  //FIGHTER ENGAGEMENT ZONE/FIGHTER AOR
+	RPAT_GROUND_AREA_OF_RESPONSIBILITY = 51;  //GROUND AREA OF RESPONSIBILITY
+	RPAT_DEFENDED_AREA = 52;  //DEFENDED AREA
+	RPAT_DANGER = 53;  //DANGER
+	RPAT_CONTAMINATED = 54;  //CONTAMINATED
+	RPAT_MISSILE_ENGAGEMENT_ZONE = 55;  //MISSILE ENGAGEMENT ZONE
+	RPAT_HOSTILE_WEAPON_ZONE = 56;  //HOSTILE WEAPON ZONE
+	RPAT_HOSTILE_TACTICAL_ZONE = 57;  //HOSTILE TACTICAL ZONE
+	RPAT_SHORAD = 58;  //SHORAD
+	RPAT_KILL_ZONE = 59;  //KILL ZONE
+	RPAT_TARGET_AREA_OF_INTEREST = 60;  //TARGET AREA OF INTEREST
+	RPAT_NAMED_AREA_OF_INTEREST__NAI_ = 61;  //NAMED AREA OF INTEREST
+	RPAT_SINKER = 62;  //SINKER
+	RPAT_BRIEF_CONTACT = 63;  //BRIEF CONTACT
+	RPAT_SEARCH_CENTER__ASW_ = 64;  //SEARCH CENTER
+	RPAT_ESTIMATED_POSITION__EP_ = 65;  //ESTIMATED POSITION
+	RPAT_FIX__ASW_ = 66;  //FIX
+	RPAT_NOTACK_AREA = 67;  //NOTACK AREA
+	RPAT_MOVING_HAVEN = 68;  //MOVING HAVEN
+	RPAT_SONOBUOY_POSITION = 69;  //SONOBUOY POSITION
+	RPAT_SONOBUOY_PATTERN_REFERENCE_POSITION = 70;  //SONOBUOY PATTERN REFERENCE POSITION
+	RPAT_LIMITING_LINE_OF_APPROACH = 71;  //LIMITING LINE OF APPROACH
+	RPAT_AREA_OF_PROBABILITY__ASW_ = 72;  //AREA OF PROBABILITY
+	RPAT_FRIENDLY_WEAPON_DANGER_AREA__FWDA_ = 73;  //FRIENDLY WEAPON DANGER AREA
+	RPAT_CHARTED_WRECK = 74;  //CHARTED WRECK
+	RPAT_BOTTOMED_NONSUBMARINE = 75;  //BOTTOMED NONSUBMARINE
+	RPAT_ASW_STATION = 76;  //ASW STATION
+}
+
+
+message RelationshipReasonValue {
+	RelationshipReason value = 1;
+}
+
+enum RelationshipReason {
+	RR_NOT_USED = 0;  //Other
+	RR_OTHER = 1;  //Other
+	RR_REQUEST_PERIODIC_REPORT = 2;  //REQUEST PERIODIC REPORT
+	RR_REQUEST_AUTOMATIC_EVALUATION = 3;  //REQUEST AUTOMATIC EVALUATION
+	RR_REQUEST_MANUAL_EVALUATION = 4;  //REQUEST MANUAL EVALUATION
+	RR_REQUEST_UPDATE_AND_WATCH = 5;  //REQUEST UPDATE AND WATCH
+	RR_REQUEST_DIRECTED_SEARCH = 6;  //REQUEST DIRECTED SEARCH
+	RR_CANCEL_REQUEST = 7;  //CANCEL REQUEST
+	RR_CEASE_REPORT = 8;  //CEASE REPORT
+	RR_EMITTER_EVALUATION = 9;  //EMITTER EVALUATION
+	RR_NO_FIND = 10;  //NO FIND
+	RR_EVALUATE_TRACK = 11;  //EVALUATE TRACK
+	RR_EVALUATE_SECTOR = 12;  //EVALUATE SECTOR
+	RR_DIRECTION_FINDER_REQUEST = 13;  //DIRECTION FINDER REQUEST
+	RR_JAMMING_REQUEST = 14;  //JAMMING REQUEST
+	RR_DEPLOY_DECOYS = 15;  //DEPLOY DECOYS
+	RR_DOWN_AIRCRAFT = 16;  //DOWN AIRCRAFT
+	RR_MAN_IN_WATER = 17;  //MAN IN WATER
+	RR_DITCHING = 18;  //DITCHING
+	RR_BAILOUT = 19;  //BAILOUT
+	RR_DISTRESSED_VESSEL = 20;  //DISTRESSED VESSEL
+	RR_REFUEL = 21;  //REFUEL
+	RR_ORBIT = 22;  //ORBIT
+	RR_RECALL = 23;  //RECALL
+	RR_RETURN_TO_BASE = 24;  //RETURN TO BASE
+	RR_ENGAGE = 25;  //ENGAGE
+	RR_PRIORITY_KILL = 26;  //PRIORITY KILL
+	RR_BREAK_ENGAGEMENT = 27;  //BREAK ENGAGEMENT
+	RR_INVESTIGATE_INTERROGATE = 28;  //INVESTIGATE/INTERROGATE
+	RR_CLEAR_TO_DROP = 29;  //CLEAR TO DROP
+	RR_CEASE_DO_NOT_DROP = 30;  //CEASE/DO NOT DROP
+	RR_INTERVENE = 31;  //INTERVENE
+	RR_SEARCH_AND_RESCUE = 32;  //SEARCH AND RESCUE
+	RR_COMBAT_AIR_PATROL = 33;  //COMBAT AIR PATROL
+	RR_LASER_DESIGNATION = 34;  //LASER DESIGNATION
+	RR_CLOSE_AIR_SUPPORT = 35;  //CLOSE AIR SUPPORT
+	RR_INTERDICTION = 36;  //INTERDICTION
+	RR_AERIAL_RECONNAISSANCE = 37;  //AERIAL RECONNAISSANCE
+	RR_ESCORT = 38;  //ESCORT
+	RR_SHADOW = 39;  //SHADOW
+	RR_SALVO_CLEAR_AIRCRAFT = 40;  //SALVO/CLEAR AIRCRAFT
+	RR_COVER = 41;  //COVER
+	RR_VISUAL_IDENTIFICATION = 42;  //VISUAL IDENTIFICATION
+	RR_HIGH_INTEREST_TRACK_DESIGNATION = 43;  //HIGH INTEREST TRACK DESIGNATION
+	RR_CANCEL_HIGH_INTEREST_TRACK_DESIGNATION = 44;  //CANCEL HIGH INTEREST TRACK DESIGNATION
+	RR_SUPPRESSION_OF_ENEMY_AIR_DEFENSES = 45;  //SUPPRESSION OF ENEMY AIR DEFENSES
+	RR_ARMED_RECONNAISSANCE = 46;  //ARMED RECONNAISSANCE
+	RR_ATTACK = 47;  //ATTACK
+	RR_CEASE_ATTACK = 48;  //CEASE ATTACK
+	RR_COUNTER_AIR_ATTACK = 49;  //COUNTER AIR ATTACK
+	RR_FIGHTER_SWEEP = 50;  //FIGHTER SWEEP
+	RR_CEASE_FIRE = 51;  //CEASE FIRE
+	RR_HOLD_FIRE = 52;  //HOLD FIRE
+	RR_ATTACK_TARGET_COMPLEX = 53;  //ATTACK TARGET COMPLEX
+	RR_CEASE_MISSION = 54;  //CEASE MISSION
+	RR_ATTACKING = 55;  //ATTACKING
+	RR_INVESTIGATING = 56;  //INVESTIGATING
+	RR_MISSILE_IN_FLIGHT_WEAPON_RELEASED = 57;  //MISSILE IN FLIGHT/WEAPON RELEASED
+	RR_TRACK_TARGET_DESTROYED = 58;  //TRACK/TARGET DESTROYED
+	RR_DISENGAGING = 59;  //DISENGAGING
+	RR_TARGET_PARTIALLY_DESTROYED = 60;  //TARGET PARTIALLY DESTROYED
+	RR_LOCK_ON_DESIGNATED_POINT_LINE_AREA = 61;  //LOCK ON/DESIGNATED POINT/LINE/AREA
+	RR_BATTLE_DAMAGE_ASSESSMENT_UNKNOWN = 62;  //BATTLE DAMAGE ASSESSMENT UNKNOWN
+	RR_RECOMMEND_REATTACK = 63;  //RECOMMEND REATTACK
+	RR_ENGAGING = 64;  //ENGAGING
+	RR_LOCK_ON_PRIMARY_DESIGNATED_TARGET = 65;  //LOCK ON/PRIMARY DESIGNATED TARGET
+	RR_NOT_EFFECTIVE = 66;  //NOT EFFECTIVE
+	RR_COVERING = 67;  //COVERING
+	RR_LOCK_ON_DESIGNATED_SURFACE_TARGET = 68;  //LOCK ON/DESIGNATED SURFACE TARGET
+	RR_LOCK_ON_DESIGNATED_SUBSURFACE_TARGET = 69;  //LOCK ON/DESIGNATED SUBSURFACE TARGET
+	RR_LOCK_ON_DESIGNATED_GROUND_TARGET = 70;  //LOCK ON/DESIGNATED GROUND TARGET
+	RR_ENGAGING_ATTACKING = 71;  //ENGAGING/ATTACKING
+	RR_LOCK_ON = 72;  //LOCK ON
+	RR_WEAPON_ASSIGNED = 73;  //WEAPON ASSIGNED
+	RR_TRACKING_LOCKED_ON_READY_TO_FIRE_BIRD_AFFIRM = 74;  //TRACKING/LOCKED ON/READY TO FIRE/BIRD AFFIRM
+	RR_FIRING_MISSILE_IN_FLIGHT_ENGAGING_TO_DESTROY_DECOY_LAUNCHED = 75;  //FIRING/MISSILE IN FLIGHT/ENGAGING TO DESTROY/DECOY LAUNCHED
+	RR_EFFECTIVE_TARGET_DESTROYED_GRAND_SLAM = 76;  //EFFECTIVE/TARGET DESTROYED/GRAND SLAM
+	RR_PARTIALLY_EFFECTIVE = 77;  //PARTIALLY EFFECTIVE
+	RR_ENGAGEMENT_BROKEN = 78;  //ENGAGEMENT BROKEN
+	RR_ENGAGEMENT_INTERRUPTED = 79;  //ENGAGEMENT INTERRUPTED
+	RR_INVESTIGATING_INTERROGATING = 80;  //INVESTIGATING/INTERROGATING
+	RR_SHADOWING = 81;  //SHADOWING
+	RR_INTERVENING = 82;  //INTERVENING
+}
+
+
+message RelationshipTypeValue {
+	RelationshipType value = 1;
+}
+
+enum RelationshipType {
+	RT_NOT_USED = 0;  //Not used
+	RT_SUBJECT_ENGAGEMENT_OBJECTIVE = 1;  //Subject engagement objective
+	RT_CONTROLLER_UNIT_TO_CONTROLLED = 2;  //Controller unit to controlled
+	RT_SUBJECT_TO_COMMAND_OBJECTIVE = 3;  //Subject to command objective
+	RT_EMERGENCY_POINT_TO_PREVIOUSLY_REPORTED_ENTITY = 4;  //Emergency point to previously reported entity
+	RT_LAUNCH_POINT_TO_MISSILE = 5;  //Launch point to missile
+	RT_MISSILE_TO_IMPACT_POINT = 6;  //Missile to impact point
+}
+
+
+message ReportingActionTypeValue {
+	ReportingActionType value = 1;
+}
+
+enum ReportingActionType {
+	RA_TELL_ON = 0;  //Tell On
+	RA_TELL_OFF = 1;  //Tell Off
+	RA_NO_CHANGE = 2;  //No Change
+}
+
+
+message ReportingLinkValue {
+	ReportingLink value = 1;
+}
+
+enum ReportingLink {
+	RL_LINK16 = 0;  //Link 16
+	RL_IBS = 1;  //Integrated Broadcast System
+}
+
+
+message ReportStatusValue {
+	ReportStatus value = 1;
+}
+
+enum ReportStatus {
+	RS_NewTrack = 0;  //New track
+	RS_TrackUpdate = 1;  //Track update
+	RS_LostTrack = 2;  //Lost track
+	RS_CorrelatedTrack = 3;  //Correlated track
+}
+
+
+message RoiConditionTypeValue {
+	RoiConditionType value = 1;
+}
+
+enum RoiConditionType {
+	RCT_EQUALS = 0;  //equals
+	RCT_GREATER_THAN = 1;  //greater than
+	RCT_LESS_THAN = 2;  //less than
+	RCT_NOT_EQUALS = 3;  //not equals
+	RCT_GREATER_OR_EQUAL = 4;  //greater or equal
+	RCT_LESS_OR_EQUAL = 5;  //less or equal
+}
+
+
+message RoiParameterTypeValue {
+	RoiParameterType value = 1;
+}
+
+enum RoiParameterType {
+	RPT_ELNOT_CONFIDENCE = 0;  //ELNOT Confidence
+	RPT_ELNOT = 1;  //ELNOT
+	RPT_TARGET_CLASSIFICATION = 2;  //Target Classification
+	RPT_CEP = 3;  //CEP
+	RPT_COLLECTION_TYPE = 4;  //Collection Type
+	RPT_MESSAGE_TYPE = 5;  //Message Type
+	RPT_SYMBOL_ENVIRONMENT = 6;  //Symbol Environment
+	RPT_SYMBOL_IDENTITY = 7;  //Symbol Identity
+	RPT_INTEREST_LEVEL = 8;  //Interest Level
+	RPT_ERROR_ELLIPSE_SEMI_MAJOR_AXIS = 9;  //Error ellipse semi-major axis
+}
+
+
+message ScanTypeValue {
+	ScanType value = 1;
+}
+
+enum ScanType {
+	SCT_CIRCULAR = 0;  //Circular
+	SCT_HORIZONTAL_SECTOR_BI_DIRECTIONAL = 1;  //Horizontal Sector Bidirectional
+	SCT_VERTICAL_SECTOR_BI_DIRECTIONAL = 2;  //Vertical Sector Bidirectional
+	SCT_NON_SCANNING = 3;  //Non-Scanning
+	SCT_IRREGULAR = 4;  //Irregular
+	SCT_CONICAL = 5;  //Conical
+	SCT_LOBE_SWITCHING = 6;  //Lobe Switching
+	SCT_RASTER = 7;  //Raster
+	SCT_SPIRAL = 8;  //Spiral
+	SCT_HELICAL = 9;  //Helical
+	SCT_CIRCULAR_AND_VERTICAL_SECTOR = 10;  //Circular and Vertical Sector
+	SCT_CIRCULAR_AND_CONICAL = 11;  //Circular and Conical
+	SCT_SECTOR_AND_CONICAL = 12;  //Sector and Conical
+	SCT_AGILE_BEAM = 13;  //Agile Beam
+	SCT_OTHER = 14;  //Other
+	SCT_VERTICAL_SECTOR_UNIDIRECTIONAL = 15;  //Vertical Sector Unidirectional
+	SCT_HORIZONTAL_SECTOR_UNIDIRECTIONAL = 16;  //Horizontal Sector Unidirectional
+	SCT_UNIDIRECTIONAL_SECTOR = 17;  //Unidirectional Sector
+	SCT_BIDIRECTIONAL_SECTOR = 18;  //Bidirectional Sector
+}
+
+
+message SecurityClassificationValue {
+	SecurityClassification value = 1;
+}
+
+enum SecurityClassification {
+	SC_RESERVED = 0;  //RESERVED
+	SC_TOP_SECRET = 1;  //TOP SECRET
+	SC_SECRET = 2;  //SECRET
+	SC_CONFIDENTIAL = 3;  //CONFIDENTIAL
+	SC_UNCLASSIFIED = 5;  //UNCLASSIFIED
+}
+
+
+message SecurityCompartmentValue {
+	SecurityCompartment value = 1;
+}
+
+enum SecurityCompartment {
+	SCO_NO_COMPARTMENT = 0;  //NO COMPARTMENT
+	SCO_SI = 1;  //SI
+	SCO_TK = 2;  //TK
+	SCO_SI_TK = 3;  //SI/TK
+}
+
+
+message SecurityReleasabilityValue {
+	SecurityReleasability value = 1;
+}
+
+enum SecurityReleasability {
+	SRC_UNRESTRICTED = 0;  //UNRESTRICTED
+	SRC_NO_RELEASABILITY = 1;  //NO RELEASABILITY
+	SRC_USA_AUS_CAN_GBR_NZL = 5;  //USA/AUS/CAN/GBR/NZL
+	SRC_US_KOR = 6;  //USA/KOR
+	SRC_USA_NATO = 7;  //USA/NATO
+	SRC_FOUO = 11;  //FOUO
+}
+
+
+message SegmentTypeValue {
+	SegmentType value = 1;
+}
+
+enum SegmentType {
+	SGT_ORIGINAL_SEGMENT = 0;  //Original segment
+	SGT_SEGMENT_RESEND = 1;  //Segment Resend
+}
+
+
+message SensorStatusTypeValue {
+	SensorStatusType value = 1;
+}
+
+enum SensorStatusType {
+	SS_FAILED = 0;  //Failed
+	SS_FUNCTIONAL = 1;  //Functional
+	SS_DEGRADED = 2;  //Degraded
+	SS_DENIED = 3;  //Denied
+}
+
+
+message SensorTypeValue {
+	SensorType value = 1;
+}
+
+enum SensorType {
+	ST_OTHER = 0;  //Other
+	ST_ELINT_DF = 1;  //ELINT DF
+	ST_ELINT_TDOA = 2;  //ELINT TDOA
+	ST_COMINT_DF = 3;  //COMINT DF
+	ST_COMINT_TDOAFDOA = 4;  //COMINT TDOA/FDOA
+	ST_GMTI = 5;  //GMTI
+	ST_IMINT = 6;  //IMINT
+	ST_ELINT_DF_TDOA = 7;  //ELINT DF/TDOA
+	ST_AMTI = 8;  //AMTI
+	ST_AIS = 9;  //Automatic Identification System (AIS)
+	ST_ACOUSTIC = 10;  //Acoustic
+	ST_SAR = 11;  //Synthetic Aperture Radar
+	ST_EOIR = 12;  //EO/IR
+	ST_PROFORMA = 13;  //Proforma
+	ST_ELINT_GENERIC = 14;  //Generic ELINT
+	ST_COMINT_PRECISION = 15;  //Precision COMINT
+	ST_VIDEO = 16;  //Video
+	ST_IMINT_EXPLOITATION = 17;  //IMINT Exploitation
+	ST_IMINT_CHANGE_DETECTION = 18;  //IMINT Change Detection
+	ST_COMINT_ADVANCED = 19;  //COMINT Advanced
+}
+
+
+message SentinelFlagValue {
+	SentinelFlag value = 1;
+}
+
+enum SentinelFlag {
+	SNTF_NOT_FOR_TASKING = 0;  //Not for Tasking
+	SNTF_FOR_TASKING = 1;  //For Tasking
+}
+
+
+message SignalAmpValue {
+	SignalAmp value = 1;
+}
+
+enum SignalAmp {
+	SA_UNKNOWN = 0;  //Unknown
+	SA_NET = 1;  //Net
+	SA_HOPPER = 2;  //Hopper
+	SA_SINGLE_EMITTER = 3;  //Single Emitter
+	SA_DSSS = 4;  //DSSS
+}
+
+
+message SimulationFlagValue {
+	SimulationFlag value = 1;
+}
+
+enum SimulationFlag {
+	SF_LIVE = 0;  //Live data
+	SF_SIMULATED = 1;  //Simulated data
+	SF_BENCHMARK = 2;  //Benchmark data
+}
+
+
+message SpecialInterestIndicatorValue {
+	SpecialInterestIndicator value = 1;
+}
+
+enum SpecialInterestIndicator {
+	SII_SAR_Point = 0;  //SAR Point
+	SII_SpecialOperationArea = 1;  //Special Operation Area
+	SII_MTI_EngagementPoint = 2;  //MTI Engagement Point
+	SII_WMD_Site = 3;  //WMD Site
+	SII_NamedAreaOfInterest = 4;  //Named Area of Interest (NAI)
+}
+
+
+message TargetClassValue {
+	TargetClass value = 1;
+}
+
+enum TargetClass {
+	TC_DEFAULT = 0;  //Default
+	TC_ROTATOR = 1;  //Rotator
+	TC_MTI = 2;  //MTI
+	TC_GROUND_MOVER = 3;  //Ground Mover
+	TC_WHEELED = 4;  //Wheeled
+	TC_TRACKED = 5;  //Tracked
+	TC_MIXED = 6;  //Mixed
+	TC_HELICOPTER = 7;  //Helicopter
+	TC_UNKNOWN = 8;  //Unknown
+	TC_CONVOY = 9;  //Convoy
+	TC_ROTATOR_MOVER = 10;  //Rotator and Mover
+	TC_AIRBORNE_MOVER = 11;  //Airborne Mover
+	TC_SURFACE_MOVER = 12;  //Surface Mover
+	TC_DISMOUNT = 13;  //Dismount
+}
+
+
+message TargetJammerTypeValue {
+	TargetJammerType value = 1;
+}
+
+enum TargetJammerType {
+	JT_UNKNOWN = 0;  //Unknown
+	JT_VELOCITY_DECEPTION = 1;  //Velocity deception
+	JT_RANGE_DECEPTION = 2;  //Range deception
+	JT_NOISE_JAMMING = 3;  //Noise jamming
+	JT_ANGLE_DECEPTION = 4;  //Angle deception
+}
+
+
+message TaskStateValue {
+	TaskState value = 1;
+}
+
+enum TaskState {
+	TS_ISSUED = 0;  //Issued
+	TS_EXECUTING = 1;  //Executing
+	TS_COMPLETED = 2;  //Completed
+	TS_EXPIRED = 3;  //Expired
+}
+
+
+message TaskRejectionReasonValue {
+	TaskRejectionReason value = 1;
+}
+
+enum TaskRejectionReason {
+	TRR_PLATFORMS_NOT_AVAILABLE = 0;  //Platforms not available
+	TRR_SENSOR_TYPE_NOT_AVAILABLE = 1;  //Sensor type not available
+	TRR_SENSOR_TASK_DEPTH_NOT_AVAILABLE = 2;  //Sensor task depth not available
+	TRR_SENSOR_WOULD_NOT_EXECUTE = 3;  //Sensor would not execute
+	TRR_NETWORK_NOT_AVAILABLE = 4;  //Network not available
+	TRR_INVALID_NCCT_ID = 5;  //Invalid NCCT ID
+	TRR_WILL_EXECUTE_IN_FUTURE = 6;  //Sensor will execute in future
+	TRR_INVALID_TASK_ID = 7;  //Invalid Task ID
+	TRR_UNKNOWN_TASK_ID = 8;  //Unknown Task ID
+	TRR_SENSOR_FOV_CHECK_FAILED = 9;  //Sensor FOV check failed
+}
+
+
+message ManualAssociationRejectionReasonValue {
+	ManualAssociationRejectionReason value = 1;
+}
+
+enum ManualAssociationRejectionReason {
+	MAR_CANNOT_COMBINE_PARAMETRICALLY = 0;  //Elements cannot be parametrically combined
+	MAR_CANNOT_COMBINE_GEOMETRICALLY = 1;  //Elements cannot be geometrically combined
+	MAR_RF_FREQUENCY_MISMATCH = 2;  //RF frequency mismatch (ELINT and RFINT)
+	MAR_MODULATION_MISMATCH = 3;  //Modulation mismatch (RFINT)
+	MAR_LOBS_OR_CONE_ANGLES_DIVERGE = 4;  //Cone angles and/or LOBs diverge
+	MAR_LOBS_OR_CONE_ANGLES_NEAR_PARALLEL = 5;  //Cone angles and/or LOBs near parallel
+	MAR_NO_ERROR_ELLIPSE_OVERLAY = 6;  //No error ellipse overlay with other data
+	MAR_ELINT_DISASSOCIATION_NOT_ALLOWED = 7;  //Attempted disassociation not allowed (ELINT)
+	MAR_OTHER_DISASSOCIATION_NOT_ALLOWED = 8;  //Attempted disassociation not allowed (Other)
+}
+
+
+message TaskCompletionTypeValue {
+	TaskCompletionType value = 1;
+}
+
+enum TaskCompletionType {
+	TCT_TASK_TIMEOUT = 0;  //Task timeout, reason unknown
+	TCT_TASK_COMPLETED_WITHOUT_DATA = 1;  //Task completed, no data measured / reported
+	TCT_TASK_COMPLETED_WITH_DATA = 2;  //Task completed, data measured / reported
+}
+
+
+message NodeDesignationErrorDeprecatedValue {
+	NodeDesignationErrorDeprecated value = 1;
+}
+
+enum NodeDesignationErrorDeprecated {
+	NDE_INVALID_IBS_REPORTING_NODE = 0;  //Invalid IBS reporting node designation
+	NDE_INVALID_LINK16_REPORTING_NODE = 1;  //Invalid Link-16 reporting node designation
+	NDE_INVALID_GCCSM_NOMINATING_NODE = 2;  //Invalid GCCS-M nominating node designation
+	NDE_INVALID_JADOCS_NOMINATING_NODE = 3;  //Invalid JADOCS nominating node designation
+	NDE_INVALID_ELINT_JICD_MASTER = 4;  //Invalid ELINT JICD master designation
+	NDE_INVALID_ELINT_JICD_GATEWAY = 5;  //Invalid ELINT JICD gateway designation
+	NDE_INVALID_TNG_JICD_GATEWAY = 6;  //Invalid TNG JICD gateway designation
+	NDE_INVALID_FUSION_ENGINE = 7;  //Invalid fusion engine designation
+}
+
+
+message TaskTypesValue {
+	TaskTypes value = 1;
+}
+
+enum TaskTypes {
+	TT_NOT_USED = 0;  //N/A
+	TT_ELINT_NORMAL = 1;  //ELINT Normal
+	TT_ELINT_PRECISION = 2;  //ELINT Precision
+	TT_ELINT_HISTORICAL = 3;  //ELINT Historical
+	TT_ELINT_IDENTITY = 4;  //ELINT Identity
+	TT_ELINT_JICD_MASTER_CAPABLE = 5;  //ELINT JICD Master Capable
+	TT_COMINT_NORMAL = 7;  //COMINT Normal
+	TT_COMINT_PRECISION = 8;  //COMINT Precision
+	TT_COMINT_HISTORICAL = 9;  //COMINT Historical
+	TT_COMINT_IDENTITY = 10;  //COMINT Identity
+	TT_COMINT_JICD_TNG_PARTICIPANT = 11;  //COMINT JICD (TNG) Participant
+	TT_COMINT_JICD_TNG_PROCESSOR = 12;  //COMINT JICD (TNG) Processor
+	TT_MTI_PRECISION = 13;  //MTI Precision
+	TT_AMTI_PRECISION = 14;  //AMTI Precision
+	TT_IMINT_PRECISION = 15;  //IMINT Precision
+	TT_IBS_REPORTING = 16;  //IBS Reporting
+	TT_LINK16_REPORTING = 17;  //Link-16 Reporting
+	TT_TNG_NODE_SELECTION_LOGIC = 18;  //TNG Node Selection Logic
+	TT_MTI_HISTORICAL = 19;  //MTI Historical
+	TT_AMTI_HISTORICAL = 20;  //AMTI Historical
+	TT_IMINT_HISTORICAL_IMAGE = 21;  //IMINT Historical Image
+	TT_IMINT_HISTORICAL_PRECISION = 22;  //IMINT Historical Precision
+	TT_IMINT_IMAGE = 23;  //IMINT Image
+	TT_IMINT_IDENTITY = 24;  //Identity (MTI, IFF, AIS, etc)
+	TT_JADOCS_NOMINATION = 25;  //JADOCS Nomination
+	TT_GCCSM_NOMINATION = 26;  //GCCS-M Nomination
+	TT_MASINT = 27;  //MASINT
+	TT_SARISAR_PRECISION = 28;  //SAR/ISAR Precision
+	TT_EOIR_PRECISION = 29;  //EO/IR Precision
+	TT_ACOUSTIC_PRECISION = 30;  //Acoustic Precision
+	TT_ACOUSTIC_DF = 31;  //Acoustic DF
+	TT_ACOUSTIC_IDENTITY = 32;  //Acoustic Identity
+	TT_IMINT_VIDEO = 33;  //IMINT Video
+	TT_AIS = 34;  //AIS
+	TT_ELINT_JICD_ST = 35;  //ELINT JICD ST
+	TT_UNKNOWN = 36;  //Unknown
+	TT_COMINT_ADVANCED = 37;  //COMINT_ADVANCED
+	TT_COMINT_ADVANCED_HISTORICAL = 38;  //COMINT_ADVANCED_HISTORICAL
+}
+
+
+message TimeFunctionTypeValue {
+	TimeFunctionType value = 1;
+}
+
+enum TimeFunctionType {
+	TF_UNKNOWN = 0;  //Unknown
+	TF_ACTIVATION_TIME = 1;  //Activation time
+	TF_DEACTIVATION_TIME = 2;  //Deactivation time
+	TF_ARRIVAL_TIME = 3;  //Arrival time
+	TF_DEPARTURE_TIME = 4;  //Departure time
+	TF_TIME_POINT_ESTABLISHED = 5;  //Time point established
+	TF_NON_OP_TIME = 6;  //Non op time
+	TF_OP_TIME = 7;  //Op time
+	TF_PREDICTED_INTERCEPT_TIME = 8;  //Predicted intercept time
+	TF_ACTUAL_INTERCEPT_TIME = 9;  //Actual intercept time
+}
+
+
+message TrackStateValue {
+	TrackState value = 1;
+}
+
+enum TrackState {
+	TRS_Coasting = 0;  //Coasting
+	TRS_Updated = 1;  //Updated
+	TRS_Dropped = 2;  //Dropped
+}
+
+
+message TravelModeValue {
+	TravelMode value = 1;
+}
+
+enum TravelMode {
+	TM_MovingOnRoad = 0;  //Moving on road
+	TM_MovingOffRoad = 1;  //Moving off road
+	TM_StoppedOnRoad = 2;  //Stopped on road
+	TM_StoppedOffRoad = 3;  //Stopped off road
+	TM_StoppedAtPossibleDestination = 4;  //Stopped at possible destination
+	TM_StoppedAtProbableDestination = 5;  //Stopped at probable destination
+	TM_StoppedAtDestination = 6;  //Stopped at destination
+	TM_Undetermined = 7;  //Undetermined
+}
+
+
+message WartimeReserveModeValue {
+	WartimeReserveMode value = 1;
+}
+
+enum WartimeReserveMode {
+	WRM_NEGATIVE = 0;  //Negative
+	WRM_PROBABLE = 1;  //Probable
+	WRM_POSITIVE = 2;  //Positive
+}

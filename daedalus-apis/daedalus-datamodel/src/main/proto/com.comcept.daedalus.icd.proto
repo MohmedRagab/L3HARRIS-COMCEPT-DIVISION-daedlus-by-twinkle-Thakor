@@ -1,0 +1,824 @@
+/*
+ * This technical data is controlled under the International Traffic in Arms Regulation (ITAR) and may not be exposed to a foreign person, either in the U.S., or abroad, without proper authorization by the U.S. Department of State.
+ *
+ * RESTRICTED RIGHTS
+ * Contract No.: UAS and Net-Centric Resource Management Teaming IR&D
+ * Contractor Name: L3HARRIS, COMCEPT DIVISION
+ * Contractor Address: 1700 Science Place, Rockwall, TX 75032
+ * The Government's rights to use, modify, reproduce, release, perform, display, or disclose this software are restricted by paragraph (b)(3) of the Rights in Noncommercial Computer Software and Noncommercial Computer Software Documentation clause contained in the above identified contract.  Any reproduction of computer software or portions thereof marked with this legend must also reproduce the markings.  Any person, other than the Government, who has been provided access to such software, must promptly notify the above named Contractor.
+ *
+ * COPYRIGHT 2018, 2020 L3 TECHNOLOGIES INC., COMCEPT DIVISION, A SUBSIDIARY OF L3HARRIS TECHNOLOGIES, INC. (L3HARRIS).  ALL RIGHTS RESERVED.
+ */
+syntax = "proto3";
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/timestamp.proto";
+import "comcept.ncct.icd.proto";
+package com.comcept.daedalus.msglib;
+option csharp_namespace = "ComCept.Daedalus.Msglib";
+option java_package = "com.comcept.daedalus.msglib";
+option java_multiple_files = true;
+// Daedalus Proto Version: 0.0.10
+
+
+message ActivateMissionPlanMsg {
+	TeamAssignmentDetails team_definition = 1;
+}
+
+
+message TeamAssignmentDetails {
+	google.protobuf.Int64Value team_id = 1;
+	repeated .comcept.ncct.msglib.NcctId member_priority_order = 2;
+	.comcept.ncct.msglib.GeoPoint rally_point = 3;
+}
+
+
+message ActivateMissionPlanStatusMsg {
+	CommandStateValue state = 1;
+}
+
+
+message MissionPlanStatusMsg {
+	google.protobuf.Int64Value team_id = 1;
+	MissionStateValue state = 2;
+}
+
+
+message TeamAssignmentMsg {
+	TeamAssignmentDetails details = 1;
+}
+
+
+message TeamInvitationMsg {
+	google.protobuf.Int64Value team_id = 1;
+	.comcept.ncct.msglib.Uuid invite_id = 2;
+	.comcept.ncct.msglib.NcctId leader_id = 3;
+}
+
+
+message TeamInvitationResponseMsg {
+	.comcept.ncct.msglib.Uuid invite_id = 1;
+	ResponseTypeValue response = 2;
+}
+
+
+message TeamRegistrationMsg {
+	google.protobuf.Int64Value team_id = 1;
+	.comcept.ncct.msglib.NcctId leader_id = 2;
+	repeated .comcept.ncct.msglib.NcctId member_ids = 3;
+}
+
+
+message TeamTaskMsg {
+	google.protobuf.Int64Value team_id = 1;
+	MessageStateValue message_state = 2;
+	.comcept.ncct.msglib.NcctId replace_id = 3;
+	TeamTaskDetails task_details = 4;
+}
+
+
+message TeamTaskDetails {
+	TeamTaskTypeValue task_type = 1;
+	.comcept.ncct.msglib.GeoObject location = 2;
+	.comcept.ncct.msglib.IdentificationDetails identification = 3;
+	oneof type {
+		EngageTargetDetails engage_details = 4;
+	}
+	CompletionCriteria completion_criteria = 5;
+}
+
+
+message EngageTargetDetails {
+	EngageTypeValue engage_type = 1;
+	repeated TargetLocationDetails location_details = 2;
+	google.protobuf.Timestamp toa = 3;
+}
+
+
+message CompletionCriteria {
+    .comcept.ncct.msglib.GeoEllipse ellipse_size = 1;
+	google.protobuf.Timestamp task_expiration_time = 2;
+}
+
+
+message TargetLocationDetails {
+	.comcept.ncct.msglib.GeoObject location = 2;
+	google.protobuf.DoubleValue azimuth = 3;
+	google.protobuf.DoubleValue elevation = 4;
+}
+
+
+message TeamTaskStatusMsg {
+	google.protobuf.Int64Value team_id = 1;
+	.comcept.ncct.msglib.NcctId team_task_id = 2;
+	TaskStatusTypeValue team_task_status = 3;
+	TeamTaskStateTypeValue team_task_state = 4;
+	TeamTaskStatusDetails team_task_status_details = 5;
+}
+
+
+message TeamTaskStatusDetails {
+	CannotComplyReasonValue cannot_comply_reason = 1;
+}
+
+
+message TeamTaskCommandMsg {
+	google.protobuf.Int64Value team_id = 1;
+	.comcept.ncct.msglib.NcctId team_task_id = 2;
+	TaskCommandTypeValue command_type = 3;
+	oneof command_details {
+		TeamDesignationDetails designation = 4;
+	}
+}
+
+
+message TeamDesignationDetails {
+	google.protobuf.Int32Value platform_id = 1;
+	oneof type {
+		EODesignationDetails eo = 2;
+	}
+}
+
+
+message EODesignationDetails {
+	google.protobuf.Int32Value x_from_center = 1;
+	google.protobuf.Int32Value y_from_center = 2;
+}
+
+
+message TeamTaskCommandStatusMsg {
+	.comcept.ncct.msglib.NcctId command_id = 1;
+	.comcept.ncct.msglib.NcctId team_task_id = 2;
+	ResponseTypeValue response = 3;
+}
+
+
+message TeamTaskNotificationMsg {
+	.comcept.ncct.msglib.NcctId team_task_id = 1;
+	TaskNotificationTypeValue notification_type = 2;
+	oneof notification_details {
+		TargetConfirmationDetails target_confirmation = 3;
+	}
+}
+
+
+message TargetConfirmationDetails {
+	.comcept.ncct.msglib.NcctId image_id = 1;
+	.comcept.ncct.msglib.NcctId source_id = 2;
+	.comcept.ncct.msglib.IdentificationDetails target_identification = 3;
+	.comcept.ncct.msglib.GeoPolygon bounding_points = 4;
+	google.protobuf.Timestamp image_time = 5;
+}
+
+
+message TeamTaskQueueMsg {
+	google.protobuf.Int64Value team_id = 1;
+	repeated TeamTaskQueueElement team_task_queue_elements = 2;
+}
+
+
+message TeamTaskQueueElement {
+	.comcept.ncct.msglib.NcctId team_task_id = 1;
+	TaskStatusTypeValue team_task_status = 2;
+	google.protobuf.Int32Value priority = 3;
+}
+
+
+message FusionTaskMsg {
+	MessageStateValue message_state = 1;
+	.comcept.ncct.msglib.NcctId dest_platform_id = 2;
+	.comcept.ncct.msglib.NcctId team_task_id = 3;
+	FusionMethodTypeValue fusion_method = 4;
+	repeated .comcept.ncct.msglib.IntelligenceTypeValue consumes_type = 5;
+	.comcept.ncct.msglib.FusionProductTypeValue fusion_product_type = 6;
+	FusionProductSubTypeValue fusion_product_subtype = 7;
+}
+
+
+message FusionTaskStatusMsg {
+	.comcept.ncct.msglib.NcctId team_task_id = 1;
+	.comcept.ncct.msglib.NcctId fusion_task_id = 2;
+	TaskStatusTypeValue fusion_task_status = 3;
+	FusionTaskStatusDetails fusion_task_status_details = 4;
+}
+
+
+message FusionTaskStatusDetails {
+	CannotComplyReasonValue cannot_comply_reason = 1;
+}
+
+
+message PilotTaskMsg {
+	MessageStateValue message_state = 1;
+	.comcept.ncct.msglib.NcctId team_task_id = 2;
+	.comcept.ncct.msglib.NcctId dest_platform_id = 3;
+	PilotTaskDetails task_details = 4;
+}
+
+
+message PilotTaskDetails {
+	PilotTaskTypeValue task_type = 1;
+	VehicleTaskDetails vehicle_task_details = 2;
+	SensorTaskDetails sensor_task_details = 3;
+}
+
+
+message VehicleTaskDetails {
+	VehicleTaskTypeValue task_type = 1;
+	RouteInfoDetails route = 2;
+}
+
+
+message SensorTaskDetails {
+	SensorTaskTypeValue task_type = 1;
+	oneof detail_type {
+		ESMDetails esm = 4;
+		PODetails po = 5;
+	}
+}
+
+
+message PilotTaskStatusMsg {
+	.comcept.ncct.msglib.NcctId team_task_id = 1;
+	.comcept.ncct.msglib.NcctId pilot_task_id = 2;
+	TaskStatusTypeValue pilot_task_status = 3;
+	PilotTaskStateTypeValue pilot_task_state = 4;
+	PilotTaskStatusDetails pilot_task_status_details = 5;
+}
+
+
+message PilotTaskStatusDetails {
+	CannotComplyReasonValue cannot_comply_reason = 1;
+}
+
+
+message PilotTaskCommandMsg {
+	TaskCommandTypeValue command_type = 1;
+	oneof command_details {
+		PlatformDesignationDetails designation = 2;
+	}
+}
+
+
+message PlatformDesignationDetails {
+	oneof type {
+		EODesignationDetails eo = 1;
+	}
+}
+
+
+message PilotTaskCommandStatusMsg {
+	.comcept.ncct.msglib.NcctId command_id = 1;
+	ResponseTypeValue response = 2;
+}
+
+
+message VehicleTaskMsg {
+	MessageStateValue message_state = 1;
+	.comcept.ncct.msglib.NcctId team_task_id = 2;
+	.comcept.ncct.msglib.NcctId pilot_task_id = 3;
+	VehicleTaskDetails task_details = 4;
+}
+
+
+message RouteInfoDetails {
+	.comcept.ncct.msglib.Uuid first_path_in_route = 1;
+	repeated PathDetails paths = 2;
+}
+
+
+message PathDetails {
+	.comcept.ncct.msglib.Uuid path_id = 1;
+	.comcept.ncct.msglib.Uuid first_segment_in_path = 2;
+	repeated PathSegmentDetails segments = 3;
+}
+
+
+message PathSegmentDetails {
+	.comcept.ncct.msglib.Uuid segment_id = 1;
+	google.protobuf.DoubleValue speed = 2;
+	oneof endpoint {
+		WaypointDetails waypoint = 3;
+		LoiterDetails loiter = 4;
+	}
+	NextPathSegmentDetails next_path_segment = 5;
+}
+
+
+message WaypointDetails {
+	.comcept.ncct.msglib.GeoPoint point = 1;
+	DmpiDataDetails temp = 2;
+	.comcept.ncct.msglib.GeoPoint coordinates = 3;
+	ImpactConditionDetails impact_conditions = 4;
+}
+
+
+message LoiterDetails {
+	LoiterTypeValue orbit_type = 1;
+	repeated .comcept.ncct.msglib.GeoPoint loiter_point = 2;
+	google.protobuf.DoubleValue orbit_radius = 3;
+	RelativeDirectionValue orbit_direction = 4;
+	google.protobuf.Int32Value number_of_orbits = 5 [(.comcept.ncct.msglib.validator) = {min: 1, max: 2147483647 }];
+}
+
+
+message NextPathSegmentDetails {
+	.comcept.ncct.msglib.Uuid path_id = 1;
+	.comcept.ncct.msglib.Uuid path_segment_id = 2;
+}
+
+
+message DmpiDataDetails {
+	google.protobuf.Int32Value temp = 1;
+}
+
+
+message ImpactConditionDetails {
+	FuzeModeValue fuze_mode = 1;
+	google.protobuf.DoubleValue fuze_HeightofBurst = 2;
+	google.protobuf.DoubleValue impact_elevation_angle = 3;
+	google.protobuf.DoubleValue impact_azimuth_angle = 4;
+}
+
+
+message VehicleTaskStatusMsg {
+	.comcept.ncct.msglib.NcctId team_task_id = 1;
+	.comcept.ncct.msglib.NcctId pilot_task_id = 2;
+	.comcept.ncct.msglib.NcctId vehicle_task_id = 3;
+	TaskStatusTypeValue vehicle_task_status = 4;
+	VehicleTaskStatusDetails vehicle_task_status_details = 5;
+}
+
+
+message VehicleTaskStatusDetails {
+	CannotComplyReasonValue cannot_comply_reason = 1;
+	VehicleStateValue state_details = 2;
+}
+
+
+message SensorTaskMsg {
+	MessageStateValue message_state = 1;
+	.comcept.ncct.msglib.NcctId team_task_id = 2;
+	.comcept.ncct.msglib.NcctId pilot_task_id = 3;
+	SensorTaskDetails task_details = 4;
+}
+
+
+message ESMDetails {
+	ESMTaskTypeValue task_type = 1;
+	oneof detail_type {
+		PulseDataCollectDetails pulse_data_collect_details = 2;
+	}
+}
+
+
+message PODetails {
+	POTaskTypeValue task_type = 1;
+	google.protobuf.DoubleValue min_niirs = 2;
+	google.protobuf.DoubleValue desired_niirs = 3;
+	oneof detail_type {
+		LookAtDetails look_at_details = 4;
+		TrackDetails track_details = 5;
+	}
+}
+
+
+message PulseDataCollectDetails {
+	google.protobuf.BytesValue scm_payload = 1;
+}
+
+
+message LookAtDetails {
+	oneof detail_type {
+		.comcept.ncct.msglib.GeoObject geospatial = 1;
+		TurretPositionDetails pointed = 2;
+	}
+}
+
+
+message TrackDetails {
+	google.protobuf.Int32Value x_from_center = 1;
+	google.protobuf.Int32Value y_from_center = 2;
+}
+
+
+message TurretPositionDetails {
+	google.protobuf.DoubleValue azimuth_angle = 1;
+	google.protobuf.DoubleValue elevation_angle = 2;
+	LOSReferenceTypeValue reference_type = 3;
+}
+
+
+message SensorTaskStatusMsg {
+	.comcept.ncct.msglib.NcctId sensor_task_id = 1;
+	TaskStatusTypeValue sensor_task_status = 2;
+	SensorTaskStatusDetails sensor_task_status_details = 3;
+}
+
+
+message SensorTaskStatusDetails {
+	CannotComplyReasonValue cannot_comply_reason = 1;
+}
+
+
+message TrackerCommandMsg {
+	google.protobuf.Int32Value designate_id = 1 [(.comcept.ncct.msglib.validator) = {min: 1, max: 2147483647 }];
+	CommandStateValue state = 2;
+	TrackerModeValue mode = 3;
+}
+
+
+message HealthAndStatusMsg {
+	oneof status {
+		PlatformStatusDetails platform_details = 1;
+		AgentStatusDetails agent_details = 2;
+		ResourceStatusDetails resource_details = 3;
+	}
+}
+
+
+message PlatformStatusDetails {
+	google.protobuf.StringValue tail_number = 1;
+	HealthAndStatusTypeValue status = 2;
+	repeated AgentStatusDetails agent_details = 3;
+}
+
+
+message AgentStatusDetails {
+	AgentTypeValue agent_type = 1;
+	HealthAndStatusTypeValue status = 2;
+	google.protobuf.StringValue state = 3;
+	repeated ResourceStatusDetails resource_details = 4;
+}
+
+
+message ResourceStatusDetails {
+	google.protobuf.StringValue name = 1;
+	HealthAndStatusTypeValue status = 2;
+}
+
+
+message AgentTypeValue {
+	AgentType value = 1;
+}
+
+enum AgentType {
+	AT_UNKNOWN = 0;  //Unknown
+	AT_TEAM_AGENT = 1;  //Team Agent
+	AT_PILOT_AGENT = 2;  //Pilot Agent
+	AT_VEHICLE_AGENT = 3;  //Vehicle Agent
+	AT_SENSOR_AGENT = 4;  //Sensor Agent
+	AT_FUSION_AGENT = 5;  //Fusion Agent
+}
+
+
+message CannotComplyReasonValue {
+	CannotComplyReason value = 1;
+}
+
+enum CannotComplyReason {
+	CCR_UNKNOWN = 0;  //Unknown reason
+	CCR_CONSTRAINT_ENDURANCE = 1;  //Insufficient endurance (e.g. fuel or battery limitations)
+	CCR_CONSTRAINT_FOR_FOV_LIMIT = 2;  //Field of view (FOV) or field of regard (FOR) limitations exceeded
+	CCR_CONSTRAINT_MANEUVER_LIMIT = 3;  //Maneuvering exceeds maneuver limits of the action
+	CCR_CONSTRAINT_RANGE = 4;  //Range related limitation of the associated capability
+	CCR_CONSTRAINT_RF = 5;  //Conflict between the needed/commanded RF parameters and the RF spectrum available
+	CCR_CONSTRAINT_ROUTE = 6;  //Cannot achieve the task given the currently planned route
+	CCR_CONSTRAINT_TIME = 7;  //Temporal requirements can't be achieved or were reached before the action achieved the desired result
+	CCR_INFEASIBLE_ROUTE = 8;  //A route to achieve the task couldn't be generated
+	CCR_MISSION_EVENT = 9;  //General mission event (flight contigency, mission contigency, etc.)
+	CCR_STATE_OR_SETTINGS = 10;  //Current/future state or settings of the corresponding capability or subsystem
+	CCR_CAPABILITY_FAULT = 11;  //Associated capability is faulted
+	CCR_CAPABILITY_UNAVAILABLE = 12;  //Associated capability wasn't available at the needed time
+	CCR_MULTIPLE = 13;  //Multiple enumeration reasons but a specific single reason isn't known
+	CCR_CANCELLED = 14;  //Task was cancelled, generally by the originating source
+	CCR_OTHER = 15;  //Another reason which hasn't yet been incorporated into the enumeration
+}
+
+
+message CommandStateValue {
+	CommandState value = 1;
+}
+
+enum CommandState {
+	CS_ACCEPTED = 0;  //
+	CS_EXECUTING = 1;  //
+	CS_REJECTED = 2;  //
+	CS_COMPLETED = 3;  //
+}
+
+
+message EngageTypeValue {
+	EngageType value = 1;
+}
+
+enum EngageType {
+	ET_GPS_TERMINAL = 0;  //Use GPS to engage target
+	ET_EO_TERMINAL = 1;  //Use EO to engage target
+}
+
+
+message ESMTaskTypeValue {
+	ESMTaskType value = 1;
+}
+
+enum ESMTaskType {
+	ETT_PULSE_DATA_COLLECT = 0;  //Pulse data collection
+}
+
+
+message FuzeModeValue {
+	FuzeMode value = 1;
+}
+
+enum FuzeMode {
+	FM_IMPACT = 0;  //
+	FM_PROXIMITY = 1;  //
+	FM_TIME = 2;  //
+	FM_HYDROSTATIC = 3;  //
+}
+
+
+message FusionMethodTypeValue {
+	FusionMethodType value = 1;
+}
+
+enum FusionMethodType {
+	FMT_TDOA = 0;  //Time difference of arrival
+}
+
+
+message FusionProductSubTypeValue {
+	FusionProductSubType value = 1;
+}
+
+enum FusionProductSubType {
+	FPST_PRECISION = 0;  //Precision report
+	FPST_COMPOSITE = 1;  //Composite report
+}
+
+
+message HealthAndStatusTypeValue {
+	HealthAndStatusType value = 1;
+}
+
+enum HealthAndStatusType {
+	HST_UNKNOWN = 0;  //Indicates the resource is in an unknown state
+	HST_NORMAL = 1;  //Indicates the resource is functioning normally
+	HST_DEGRADED = 2;  //The resource has some capability that is no longer functional but is still able to perform its tasks
+	HST_INACTIVE = 3;  //The resource is inactive and not able to perform tasks
+	HST_FAILED = 4;  //The resource can no longer perform necessary functions
+}
+
+
+message ImintTaskTypeValue {
+	ImintTaskType value = 1;
+}
+
+enum ImintTaskType {
+	ITT_SEARCH = 0;  //Specifies that a search for targets is to be performed using the collected image data
+	ITT_TARGET_CLASSIFICATION = 1;  //Specifies that an identification for targets is to be performed using the collected image data
+	ITT_TRACK = 2;  //Specifies that a tracking of targets is to be performed using the collected image data
+}
+
+
+message ResponseTypeValue {
+	ResponseType value = 1;
+}
+
+enum ResponseType {
+	RT_ACCEPT = 0;  //Accept
+	RT_DECLINE = 1;  //Decline
+}
+
+
+message LoiterTypeValue {
+	LoiterType value = 1;
+}
+
+enum LoiterType {
+	LT_CIRCLE = 0;  //Specified a circular orbit (SemiMajor==SemiMinor)
+	LT_RACETRACK = 1;  //Specified a race track orbit (SemiMajor != SemiMinor)
+	LT_FIGURE_EIGHT = 2;  //Specified figure eight orbit type.
+}
+
+
+message LOSReferenceTypeValue {
+	LOSReferenceType value = 1;
+}
+
+enum LOSReferenceType {
+	LRT_BODY = 0;  //Pointing relative to the body of the aircraft
+	LRT_INERTIAL = 1;  //Pointing along a fixed inertial angle
+}
+
+
+message MessageStateValue {
+	MessageState value = 1;
+}
+
+enum MessageState {
+	MS_NEW = 0;  //The message is new to the network
+	MS_UPDATE = 1;  //The message is an update to a message previously on the network
+	MS_REMOVE = 2;  //The message is to be removed from the network
+}
+
+
+message MissionStateValue {
+	MissionState value = 1;
+}
+
+enum MissionState {
+	MS_DEFINED = 0;  //
+	MS_ASSIGNED = 1;  //
+	MS_READY = 2;  //
+	MS_TASKED = 3;  //
+	MS_RALLY_LOCATION = 4;  //
+}
+
+
+message DaedalusMessageTypeValue {
+	DaedalusMessageType value = 1;
+}
+
+enum DaedalusMessageType {
+	Unknown = 0;  //Unknown
+	ActivateMissionPlan = 10001;  //ActivateMissionPlan
+	ActivateMissionPlanStatus = 10002;  //ActivateMissionPlanStatus
+	MissionPlanStatus = 10003;  //MissionPlanStatus
+	TeamAssignment = 10004;  //TeamAssignment
+	TeamInvitation = 10005;  //TeamInvitation
+	TeamInvitationResponse = 10006;  //TeamInvitationResponse
+	TeamRegistration = 10007;  //TeamRegistration
+	TeamTask = 10008;  //TeamTask
+	TeamTaskStatus = 10009;  //TeamTaskStatus
+	TeamTaskCommand = 10010;  //TeamTaskCommand
+	TeamTaskCommandStatus = 10011;  //TeamTaskCommandStatus
+	TeamTaskNotification = 10012;  //TeamTaskNotification
+	TeamTaskQueue = 10013;  //TeamTaskQueue
+	FusionTask = 10014;  //FusionTask
+	FusionTaskStatus = 10015;  //FusionTaskStatus
+	PilotTask = 10016;  //PilotTask
+	PilotTaskStatus = 10017;  //PilotTaskStatus
+	PilotTaskCommand = 10018;  //PilotTaskCommand
+	PilotTaskCommandStatus = 10019;  //PilotTaskCommandStatus
+	VehicleTask = 10020;  //VehicleTask
+	VehicleTaskStatus = 10021;  //VehicleTaskStatus
+	SensorTask = 10022;  //SensorTask
+	SensorTaskStatus = 10023;  //SensorTaskStatus
+	TrackerCommand = 10024;  //TrackerCommand
+	HealthAndStatus = 10025;  //HealthAndStatus
+}
+
+
+message PilotTaskStateTypeValue {
+	PilotTaskStateType value = 1;
+}
+
+enum PilotTaskStateType {
+	PTST_UNKNOWN = 0;  //Unknown
+	PTST_EN_ROUTE = 1;  //En route to task location
+	PTST_COLLECTING = 2;  //Collecting at task location
+	PTST_SEARCHING_FOR_TARGET = 3;  //Searching for target to acquire
+	PTST_ACQUIRING_TARGET = 4;  //Moving to acquire confirmed target
+	PTST_TARGET_DESIGNATED = 5;  //Confirmed target designated - tracking target
+	PTST_ENGAGING_TARGET = 6;  //Engaging designated target
+}
+
+
+message PilotTaskTypeValue {
+	PilotTaskType value = 1;
+}
+
+enum PilotTaskType {
+	PTT_GEOLOCATE_TARGET = 0;  //
+	PTT_REPOSITION = 1;  //
+	PTT_ACQUIRE_TARGET = 2;  //
+	PTT_ENGAGE_TARGET = 3;  //
+	PTT_BDA = 4;  //
+}
+
+
+message POTaskTypeValue {
+	POTaskType value = 1;
+}
+
+enum POTaskType {
+	PTT_LOOK_AT = 0;  //Look at the specified target
+	PTT_TRACK = 1;  //Track the specified target to keep it in the center of the aperture by steering the vehicle or turret
+}
+
+
+message RelativeDirectionValue {
+	RelativeDirection value = 1;
+}
+
+enum RelativeDirection {
+	RD_LEFT = 0;  //
+	RD_RIGHT = 1;  //
+}
+
+
+message SensorTaskTypeValue {
+	SensorTaskType value = 1;
+}
+
+enum SensorTaskType {
+	STT_ESM = 0;  //Electronic Support Measures task
+	STT_PO = 1;  //Passive Optical task
+}
+
+
+message TaskCommandTypeValue {
+	TaskCommandType value = 1;
+}
+
+enum TaskCommandType {
+	TCT_EXECUTE = 0;  //Command to execute the specified task
+	TCT_DESIGNATE_TARGET = 1;  //Command to designate target
+	TCT_ENGAGE_COMMIT = 2;  //Command to engage designated target
+}
+
+
+message TaskNotificationTypeValue {
+	TaskNotificationType value = 1;
+}
+
+enum TaskNotificationType {
+	TNT_TARGET_FOUND = 0;  //Notification that the target of interest was found
+}
+
+
+message TaskStatusTypeValue {
+	TaskStatusType value = 1;
+}
+
+enum TaskStatusType {
+	TST_ASSESSING = 0;  //Determining if execution is possible
+	TST_ACCEPTED = 1;  //Determined the task can be executed. Awaiting approval to begin execution
+	TST_QUEUED = 2;  //Task will be assessed/executed after the current task is completed
+	TST_EXECUTING = 3;  //Executing the task
+	TST_REJECT = 4;  //Determined that task can NOT be completed - reason given in Nack Reason enum
+	TST_COMPLETED_DATA = 5;  //Task has been completed, and data has been generated for it
+	TST_COMPLETED_NO_DATA = 6;  //Task has been completed, but NO data has been generated for it
+	TST_CANCELLED = 7;  //Task has been cancelled, either explicitly by the user or indirectly due to a new task overriding this one
+	TST_FAILED = 8;  //Task cannot be executed any longer, due to some unforeseen event, like a resource no longer being available
+}
+
+
+message TeamTaskStateTypeValue {
+	TeamTaskStateType value = 1;
+}
+
+enum TeamTaskStateType {
+	TTST_UNKNOWN = 0;  //Unknown
+	TTST_PLATFORMS_ENROUTE = 1;  //Platforms en route to task location
+	TTST_PLATFORMS_COLLECTING = 2;  //Platforms collecting at task location
+	TTST_SEARCHING_FOR_TARGET = 3;  //Searching for target to acquire
+	TTST_ACQUIRING_TARGET = 4;  //Moving to acquire confirmed target
+	TTST_TARGET_DESIGNATED = 5;  //Confirmed target designated - tracking target
+	TTST_ENGAGING_TARGET = 6;  //Engaging designated target
+}
+
+
+message TeamTaskTypeValue {
+	TeamTaskType value = 1;
+}
+
+enum TeamTaskType {
+	TTT_GEOLOCATE_TARGET = 0;  //Perform TDOA to geolocate target
+	TTT_ACQUIRE_TARGET = 1;  //Use imagery to identify and acquire target
+	TTT_ENGAGE_TARGET = 2;  //Engage given target
+}
+
+
+message TrackerModeValue {
+	TrackerMode value = 1;
+}
+
+enum TrackerMode {
+	TM_IDLE = 0;  //
+	TM_DESIGNATED = 1;  //
+}
+
+
+message VehicleTaskTypeValue {
+	VehicleTaskType value = 1;
+}
+
+enum VehicleTaskType {
+	VTT_FLY_ROUTE = 0;  //
+	VTT_PARK = 1;  //
+	VTT_DESTRUCT = 2;  //
+	VTT_SENSOR_SLAVE = 3;  //
+}
+
+
+message VehicleStateValue {
+	VehicleState value = 1;
+}
+
+enum VehicleState {
+	VS_LOADED = 0;  //
+	VS_ENROUTE = 1;  //
+	VS_IDLE = 2;  //
+}
